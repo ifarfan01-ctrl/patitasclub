@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PatiMatch — Patitas Club</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../adopcion/adopcion.css">
+<link rel="stylesheet" href="patimatch.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="../index.html">🐾 Patitas Club</a>
+    <div id="authBox" class="auth-box">
+      <button id="loginBtn" class="link-btn">Iniciar sesión</button>
+      <button id="registerBtn" class="link-btn">Registrarse</button>
+    </div>
+  </header>
+
+  <!-- Not logged in -->
+  <section id="gate" class="gate">
+    <h1>🐾 PatiMatch</h1>
+    <p>Encuentra un amigo peludo cerca de ti para salir a pasear juntos.
+    Regístrate y sube a tu mascota para empezar a hacer match.</p>
+    <div class="gate-actions">
+      <button id="gateLoginBtn" class="restart-btn">Iniciar sesión</button>
+      <button id="gateRegisterBtn" class="restart-btn secondary">Registrarse</button>
+    </div>
+  </section>
+
+  <!-- Logged in, no pet yet -->
+  <section id="onboarding" class="gate" hidden>
+    <h1>Agrega a tu mascota</h1>
+    <p>Para usar PatiMatch necesitas el perfil de tu mascota, incluyendo su
+    ubicación — así solo te mostramos matches con los que realmente puedas
+    ir a pasear.</p>
+    <button id="addPetBtn" class="restart-btn">+ Agregar mi mascota</button>
+  </section>
+
+  <!-- Logged in, has pet: swipe deck -->
+  <section id="deckSection" class="deck-section" hidden>
+    <div class="my-pet-bar">
+      <span id="myPetLabel"></span>
+      <button id="myMatchesBtn" class="link-btn">Mis matches (<span id="matchCount">0</span>)</button>
+    </div>
+    <div id="deck" class="deck"></div>
+    <p id="deckEmpty" class="listings-empty" hidden>No hay más mascotas cerca de ti por ahora. Vuelve más tarde.</p>
+    <div class="actions">
+      <button class="action-btn pass" id="passBtn" aria-label="Pasar">✕</button>
+      <button class="action-btn like" id="likeBtn" aria-label="Me gusta">❤</button>
+    </div>
+  </section>
+
+  <!-- Auth modal -->
+  <div id="authModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="closeAuthModal" aria-label="Cerrar">✕</button>
+      <h2 id="authTitle">Iniciar sesión</h2>
+      <form id="authForm" class="form">
+        <label>Correo
+          <input type="email" id="authEmail" required autocomplete="email">
+        </label>
+        <label>Contraseña
+          <input type="password" id="authPassword" required minlength="6" autocomplete="current-password">
+        </label>
+        <p id="authError" class="form-error" hidden></p>
+        <button type="submit" class="restart-btn" id="authSubmit">Iniciar sesión</button>
+      </form>
+      <p class="modal-switch">
+        <span id="authSwitchText">¿No tienes cuenta?</span>
+        <button type="button" id="authSwitchBtn" class="link-btn">Regístrate</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- Add pet modal -->
+  <div id="petModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="closePetModal" aria-label="Cerrar">✕</button>
+      <h2>Mi mascota</h2>
+      <form id="petForm" class="form">
+        <label>Nombre
+          <input type="text" id="petName" required maxlength="40">
+        </label>
+        <label>Especie
+          <select id="petSpecies" required>
+            <option value="Perro">Perro</option>
+            <option value="Gato">Gato</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </label>
+        <label>Raza
+          <input type="text" id="petBreed" maxlength="40" placeholder="Ej: Mestizo">
+        </label>
+        <label>Edad (años)
+          <input type="number" id="petAge" min="0" max="30" step="1">
+        </label>
+        <label>Foto (URL, opcional)
+          <input type="url" id="petPhoto" placeholder="https://...">
+        </label>
+        <label>Descripción
+          <textarea id="petDescription" rows="3" maxlength="400" placeholder="Personalidad, tamaño, con qué mascotas se lleva bien..."></textarea>
+        </label>
+        <div class="location-field">
+          <button type="button" id="captureLocationBtn" class="link-btn">📍 Usar mi ubicación actual</button>
+          <p id="locationStatus" class="form-hint">Ubicación: no capturada todavía (obligatoria).</p>
+        </div>
+        <p id="petError" class="form-error" hidden></p>
+        <button type="submit" class="restart-btn" id="petSubmit" disabled>Guardar mi mascota</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Match overlay -->
+  <div id="matchOverlay" class="modal-overlay" hidden>
+    <div class="modal-card match-card">
+      <h1>¡Es un match! 🐶❤️🐾</h1>
+      <div class="match-photos">
+        <img id="matchPhotoMine" src="" alt="">
+        <img id="matchPhotoTheirs" src="" alt="">
+      </div>
+      <p id="matchText"></p>
+      <p id="matchDistance" class="match-distance"></p>
+      <p id="matchContact" class="match-contact"></p>
+      <button id="closeMatch" class="restart-btn">Seguir viendo</button>
+    </div>
+  </div>
+
+  <!-- Matches list modal -->
+  <div id="matchesModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="closeMatchesModal" aria-label="Cerrar">✕</button>
+      <h2>Mis matches</h2>
+      <div id="matchesList" class="matches-list">
+        <p id="matchesEmpty" class="listings-empty" hidden>Todavía no tienes matches. ¡Sigue deslizando!</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="patimatch.js"></script>
+</body>
+</html>
