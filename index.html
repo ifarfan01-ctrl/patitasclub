@@ -19,10 +19,15 @@
 <meta name="twitter:image" content="https://placedog.net/1600/700?id=47">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="adopcion/adopcion.css">
 </head>
 <body>
   <header class="topbar">
     <span class="logo">🐾 Patitas Club</span>
+    <div id="authBox" class="auth-box">
+      <button id="loginBtn" class="link-btn">Iniciar sesión</button>
+      <button id="registerBtn" class="link-btn">Registrarse</button>
+    </div>
   </header>
 
   <section class="intro">
@@ -66,5 +71,29 @@
       <p>La comunidad donde las mascotas encuentran hogar, pareja y match.</p>
     </div>
   </section>
+
+  <!-- Auth modal -->
+  <div id="authModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="closeAuthModal" aria-label="Cerrar">✕</button>
+      <h2 id="authTitle">Iniciar sesión</h2>
+      <form id="authForm" class="form">
+        <label>Correo
+          <input type="email" id="authEmail" required autocomplete="email">
+        </label>
+        <label>Contraseña
+          <input type="password" id="authPassword" required minlength="6" autocomplete="current-password">
+        </label>
+        <p id="authError" class="form-error" hidden></p>
+        <button type="submit" class="restart-btn" id="authSubmit">Iniciar sesión</button>
+      </form>
+      <p class="modal-switch">
+        <span id="authSwitchText">¿No tienes cuenta?</span>
+        <button type="button" id="authSwitchBtn" class="link-btn">Regístrate</button>
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="home.js"></script>
 </body>
 </html>
