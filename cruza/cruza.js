@@ -12,6 +12,9 @@ import {
   getFirestore,
   collection,
   addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
   onSnapshot,
   query,
   orderBy,
@@ -22,6 +25,7 @@ import {
   ref,
   uploadBytes,
   getDownloadURL,
+  deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
 
@@ -51,6 +55,8 @@ const closeAuthModal = document.getElementById("closeAuthModal");
 
 const publishModal = document.getElementById("publishModal");
 const publishForm = document.getElementById("publishForm");
+const publishTitle = document.getElementById("publishTitle");
+const publishSubmit = document.getElementById("publishSubmit");
 const publishError = document.getElementById("publishError");
 const closePublishModal = document.getElementById("closePublishModal");
 const petPhotoInput = document.getElementById("petPhoto");
@@ -62,6 +68,9 @@ const listingsEmpty = document.getElementById("listingsEmpty");
 
 let authMode = "login"; // or "register"
 let currentUser = null;
+let editingPetId = null;
+let editingPetFoto = "";
+let latestDocs = [];
 
 function openAuthModal(mode) {
   authMode = mode;
@@ -155,9 +164,14 @@ function renderAuthBox() {
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   renderAuthBox();
+  renderListings();
 });
 
 publishBtn.addEventListener("click", () => {
+  editingPetId = null;
+  editingPetFoto = "";
+  publishTitle.textContent = "Publicar mascota para cruza";
+  publishSubmit.textContent = "Publicar";
   publishError.hidden = true;
   publishForm.reset();
   petPhotoPreview.hidden = true;
@@ -192,7 +206,7 @@ publishForm.addEventListener("submit", async (e) => {
   const submitBtn = publishForm.querySelector("button[type=submit]");
   submitBtn.disabled = true;
   try {
-    let fotoUrl = "";
+    let fotoUrl = editingPetFoto;
     const file = petPhotoInput.files[0];
     if (file) {
       photoStatus.textContent = "Subiendo foto...";
@@ -202,7 +216,7 @@ publishForm.addEventListener("submit", async (e) => {
       fotoUrl = await getDownloadURL(photoRef);
       photoStatus.hidden = true;
     }
-    await addDoc(collection(db, "cruzas"), {
+    const data = {
       nombre: document.getElementById("petName").value.trim(),
       especie: document.getElementById("petSpecies").value,
       sexo: document.getElementById("petSex").value,
@@ -210,20 +224,67 @@ publishForm.addEventListener("submit", async (e) => {
       edad: document.getElementById("petAge").value || null,
       foto: fotoUrl,
       descripcion: document.getElementById("petDescription").value.trim(),
-      ownerUid: currentUser.uid,
-      ownerEmail: currentUser.email,
-      createdAt: serverTimestamp(),
-    });
+    };
+    if (editingPetId) {
+      await updateDoc(doc(db, "cruzas", editingPetId), data);
+    } else {
+      await addDoc(collection(db, "cruzas"), {
+        ...data,
+        ownerUid: currentUser.uid,
+        ownerEmail: currentUser.email,
+        createdAt: serverTimestamp(),
+      });
+    }
     publishModal.hidden = true;
   } catch (err) {
-    publishError.textContent = "No se pudo publicar. Intenta de nuevo.";
+    publishError.textContent = "No se pudo guardar. Intenta de nuevo.";
     publishError.hidden = false;
   } finally {
     submitBtn.disabled = false;
   }
 });
 
-function petCard(pet) {
+function openEditModal(petId, pet) {
+  editingPetId = petId;
+  editingPetFoto = pet.foto || "";
+  publishTitle.textContent = "Editar mascota";
+  publishSubmit.textContent = "Guardar cambios";
+  publishError.hidden = true;
+  publishForm.reset();
+  document.getElementById("petName").value = pet.nombre || "";
+  document.getElementById("petSpecies").value = pet.especie || "Perro";
+  document.getElementById("petSex").value = pet.sexo || "Macho";
+  document.getElementById("petBreed").value = pet.raza || "";
+  document.getElementById("petAge").value = pet.edad || "";
+  document.getElementById("petDescription").value = pet.descripcion || "";
+  if (pet.foto) {
+    petPhotoPreview.src = pet.foto;
+    petPhotoPreview.hidden = false;
+  } else {
+    petPhotoPreview.hidden = true;
+    petPhotoPreview.src = "";
+  }
+  photoStatus.hidden = true;
+  publishModal.hidden = false;
+}
+
+async function deletePet(petId, pet) {
+  if (!confirm(`¿Borrar la publicación de ${pet.nombre || "esta mascota"}? Esta acción no se puede deshacer.`)) return;
+  try {
+    await deleteDoc(doc(db, "cruzas", petId));
+    if (pet.foto && pet.foto.includes("firebasestorage.googleapis.com")) {
+      try {
+        await deleteObject(ref(storage, pet.foto));
+      } catch (err) {
+        // La foto puede no existir o no tener permisos; no bloquea el borrado de la publicación.
+      }
+    }
+  } catch (err) {
+    alert("No se pudo borrar la publicación. Intenta de nuevo.");
+  }
+}
+
+function petCard(petId, pet) {
   const card = document.createElement("article");
   card.className = "pet-card";
 
@@ -250,17 +311,41 @@ function petCard(pet) {
   desc.textContent = pet.descripcion || "";
   body.appendChild(desc);
 
+  if (currentUser && pet.ownerUid === currentUser.uid) {
+    const actions = document.createElement("div");
+    actions.className = "pet-card-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "link-btn";
+    editBtn.textContent = "Editar";
+    editBtn.addEventListener("click", () => openEditModal(petId, pet));
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "link-btn delete-btn";
+    deleteBtn.textContent = "Borrar";
+    deleteBtn.addEventListener("click", () => deletePet(petId, pet));
+
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+    body.appendChild(actions);
+  }
+
   card.appendChild(body);
   return card;
 }
 
+function renderListings() {
+  listingsEl.querySelectorAll(".pet-card").forEach((el) => el.remove());
+  listingsEmpty.hidden = latestDocs.length > 0;
+  latestDocs.forEach(({ id, data }) => {
+    listingsEl.appendChild(petCard(id, data));
+  });
+}
+
 const q = query(collection(db, "cruzas"), orderBy("createdAt", "desc"));
 onSnapshot(q, (snapshot) => {
-  listingsEl.querySelectorAll(".pet-card").forEach((el) => el.remove());
-  listingsEmpty.hidden = !snapshot.empty;
-  snapshot.forEach((doc) => {
-    listingsEl.appendChild(petCard(doc.data()));
-  });
+  latestDocs = snapshot.docs.map((d) => ({ id: d.id, data: d.data() }));
+  renderListings();
 }, () => {
   listingsEmpty.hidden = false;
   listingsEmpty.textContent = "No se pudieron cargar las publicaciones. Intenta más tarde.";

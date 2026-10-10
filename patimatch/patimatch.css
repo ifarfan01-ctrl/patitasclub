@@ -64,6 +64,12 @@ body {
   color: var(--muted);
 }
 
+.my-pet-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .deck {
   position: relative;
   width: min(360px, 92vw);

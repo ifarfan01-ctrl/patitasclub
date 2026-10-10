@@ -119,6 +119,23 @@
   line-height: 1.4;
 }
 
+.pet-card-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(128,128,128,0.2);
+}
+
+.pet-card-actions .link-btn {
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.delete-btn {
+  color: #e8663a;
+}
+
 /* Modals */
 .modal-overlay {
   position: fixed;

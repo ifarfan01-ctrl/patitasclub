@@ -12,6 +12,8 @@ import {
   getFirestore,
   collection,
   addDoc,
+  updateDoc,
+  deleteDoc,
   getDocs,
   getDoc,
   setDoc,
@@ -25,6 +27,7 @@ import {
   ref,
   uploadBytes,
   getDownloadURL,
+  deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
 
@@ -65,6 +68,8 @@ const addPetBtn = document.getElementById("addPetBtn");
 
 const deckSection = document.getElementById("deckSection");
 const myPetLabel = document.getElementById("myPetLabel");
+const editMyPetBtn = document.getElementById("editMyPetBtn");
+const deleteMyPetBtn = document.getElementById("deleteMyPetBtn");
 const myMatchesBtn = document.getElementById("myMatchesBtn");
 const matchCountEl = document.getElementById("matchCount");
 const deckEl = document.getElementById("deck");
@@ -84,6 +89,7 @@ const authSwitchBtn = document.getElementById("authSwitchBtn");
 const closeAuthModal = document.getElementById("closeAuthModal");
 
 const petModal = document.getElementById("petModal");
+const petModalTitle = document.getElementById("petModalTitle");
 const petForm = document.getElementById("petForm");
 const petError = document.getElementById("petError");
 const petSubmit = document.getElementById("petSubmit");
@@ -110,6 +116,8 @@ const closeMatchesModal = document.getElementById("closeMatchesModal");
 // ---- State ----
 let currentUser = null;
 let myPet = null; // {id, ...data}
+let editingMyPet = false;
+let editingPetFoto = "";
 let capturedLocation = null; // {lat, lng}
 let deckPets = []; // candidates to swipe, nearest first
 let isAnimating = false;
@@ -260,6 +268,10 @@ async function loadMyPet() {
 
 // ---- Add pet ----
 addPetBtn.addEventListener("click", () => {
+  editingMyPet = false;
+  editingPetFoto = "";
+  petModalTitle.textContent = "Mi mascota";
+  petSubmit.textContent = "Guardar mi mascota";
   petError.hidden = true;
   petForm.reset();
   capturedLocation = null;
@@ -272,6 +284,61 @@ addPetBtn.addEventListener("click", () => {
   petModal.hidden = false;
 });
 closePetModal.addEventListener("click", () => { petModal.hidden = true; });
+
+editMyPetBtn.addEventListener("click", () => {
+  if (!myPet) return;
+  editingMyPet = true;
+  editingPetFoto = myPet.foto || "";
+  petModalTitle.textContent = "Editar mi mascota";
+  petSubmit.textContent = "Guardar cambios";
+  petError.hidden = true;
+  petForm.reset();
+  document.getElementById("petName").value = myPet.nombre || "";
+  document.getElementById("petSpecies").value = myPet.especie || "Perro";
+  document.getElementById("petBreed").value = myPet.raza || "";
+  document.getElementById("petAge").value = myPet.edad || "";
+  document.getElementById("petDescription").value = myPet.descripcion || "";
+  capturedLocation = (typeof myPet.lat === "number" && typeof myPet.lng === "number")
+    ? { lat: myPet.lat, lng: myPet.lng }
+    : null;
+  if (capturedLocation) {
+    locationStatus.textContent = "✓ Ubicación actual guardada (puedes actualizarla).";
+    locationStatus.classList.add("ok");
+    petSubmit.disabled = false;
+  } else {
+    locationStatus.textContent = "Ubicación: no capturada todavía (obligatoria).";
+    locationStatus.classList.remove("ok");
+    petSubmit.disabled = true;
+  }
+  if (myPet.foto) {
+    petPhotoPreview.src = myPet.foto;
+    petPhotoPreview.hidden = false;
+  } else {
+    petPhotoPreview.hidden = true;
+    petPhotoPreview.src = "";
+  }
+  photoStatus.hidden = true;
+  petModal.hidden = false;
+});
+
+deleteMyPetBtn.addEventListener("click", async () => {
+  if (!myPet) return;
+  if (!confirm(`¿Borrar a ${myPet.nombre || "tu mascota"} de PatiMatch? Esta acción no se puede deshacer.`)) return;
+  try {
+    await deleteDoc(doc(db, "patimatch_pets", myPet.id));
+    if (myPet.foto && myPet.foto.includes("firebasestorage.googleapis.com")) {
+      try {
+        await deleteObject(ref(storage, myPet.foto));
+      } catch (err) {
+        // La foto puede no existir o no tener permisos; no bloquea el borrado.
+      }
+    }
+    myPet = null;
+    showView("onboarding");
+  } catch (err) {
+    alert("No se pudo borrar tu mascota. Intenta de nuevo.");
+  }
+});
 
 petPhotoInput.addEventListener("change", () => {
   const file = petPhotoInput.files[0];
@@ -320,7 +387,7 @@ petForm.addEventListener("submit", async (e) => {
   petError.hidden = true;
   petSubmit.disabled = true;
   try {
-    let fotoUrl = "";
+    let fotoUrl = editingPetFoto;
     const file = petPhotoInput.files[0];
     if (file) {
       photoStatus.textContent = "Subiendo foto...";
@@ -330,7 +397,7 @@ petForm.addEventListener("submit", async (e) => {
       fotoUrl = await getDownloadURL(photoRef);
       photoStatus.hidden = true;
     }
-    const docRef = await addDoc(collection(db, "patimatch_pets"), {
+    const data = {
       nombre: document.getElementById("petName").value.trim(),
       especie: document.getElementById("petSpecies").value,
       raza: document.getElementById("petBreed").value.trim(),
@@ -339,11 +406,18 @@ petForm.addEventListener("submit", async (e) => {
       descripcion: document.getElementById("petDescription").value.trim(),
       lat: capturedLocation.lat,
       lng: capturedLocation.lng,
-      ownerUid: currentUser.uid,
-      ownerEmail: currentUser.email,
-      createdAt: serverTimestamp(),
-    });
-    myPet = { id: docRef.id, nombre: document.getElementById("petName").value.trim() };
+    };
+    if (editingMyPet && myPet) {
+      await updateDoc(doc(db, "patimatch_pets", myPet.id), data);
+    } else {
+      const docRef = await addDoc(collection(db, "patimatch_pets"), {
+        ...data,
+        ownerUid: currentUser.uid,
+        ownerEmail: currentUser.email,
+        createdAt: serverTimestamp(),
+      });
+      myPet = { id: docRef.id };
+    }
     petModal.hidden = true;
     await loadMyPet();
     myPetLabel.textContent = `Tu mascota: ${myPet.nombre}`;

@@ -55,7 +55,11 @@
   <section id="deckSection" class="deck-section" hidden>
     <div class="my-pet-bar">
       <span id="myPetLabel"></span>
-      <button id="myMatchesBtn" class="link-btn">Mis matches (<span id="matchCount">0</span>)</button>
+      <div class="my-pet-actions">
+        <button id="editMyPetBtn" class="link-btn">Editar</button>
+        <button id="deleteMyPetBtn" class="link-btn delete-btn">Borrar</button>
+        <button id="myMatchesBtn" class="link-btn">Mis matches (<span id="matchCount">0</span>)</button>
+      </div>
     </div>
     <div id="deck" class="deck"></div>
     <p id="deckEmpty" class="listings-empty" hidden>No hay más mascotas cerca de ti por ahora. Vuelve más tarde.</p>
@@ -101,7 +105,7 @@
   <div id="petModal" class="modal-overlay" hidden>
     <div class="modal-card">
       <button class="modal-close" id="closePetModal" aria-label="Cerrar">✕</button>
-      <h2>Mi mascota</h2>
+      <h2 id="petModalTitle">Mi mascota</h2>
       <form id="petForm" class="form">
         <label>Nombre
           <input type="text" id="petName" required maxlength="40">
