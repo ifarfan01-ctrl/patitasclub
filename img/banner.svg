@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff8a5b"/>
+      <stop offset="55%" stop-color="#f06a3f"/>
+      <stop offset="100%" stop-color="#c84a2c"/>
+    </linearGradient>
+    <g id="paw">
+      <circle cx="14" cy="24" r="7"/>
+      <circle cx="27" cy="13" r="7.5"/>
+      <circle cx="41" cy="13" r="7.5"/>
+      <circle cx="54" cy="24" r="7"/>
+      <ellipse cx="34" cy="43" rx="18" ry="15"/>
+    </g>
+  </defs>
+
+  <rect width="1600" height="500" fill="url(#bg)"/>
+
+  <g fill="#ffffff">
+    <use href="#paw" transform="translate(20,20) scale(0.5) rotate(-15,32,32)" opacity="0.12"/>
+    <use href="#paw" transform="translate(150,300) scale(0.7) rotate(20,32,32)" opacity="0.10"/>
+    <use href="#paw" transform="translate(320,70) scale(0.4) rotate(10,32,32)" opacity="0.15"/>
+    <use href="#paw" transform="translate(500,360) scale(0.6) rotate(-25,32,32)" opacity="0.08"/>
+    <use href="#paw" transform="translate(680,40) scale(0.5) rotate(30,32,32)" opacity="0.12"/>
+    <use href="#paw" transform="translate(860,320) scale(0.45) rotate(-10,32,32)" opacity="0.10"/>
+    <use href="#paw" transform="translate(1030,100) scale(0.65) rotate(15,32,32)" opacity="0.09"/>
+    <use href="#paw" transform="translate(1200,380) scale(0.5) rotate(-20,32,32)" opacity="0.13"/>
+    <use href="#paw" transform="translate(1360,50) scale(0.55) rotate(25,32,32)" opacity="0.11"/>
+    <use href="#paw" transform="translate(1480,280) scale(0.4) rotate(-5,32,32)" opacity="0.14"/>
+    <use href="#paw" transform="translate(100,160) scale(0.3) rotate(5,32,32)" opacity="0.08"/>
+    <use href="#paw" transform="translate(930,190) scale(0.35) rotate(-30,32,32)" opacity="0.07"/>
+    <use href="#paw" transform="translate(600,210) scale(0.3) rotate(40,32,32)" opacity="0.06"/>
+    <use href="#paw" transform="translate(1280,200) scale(0.3) rotate(-15,32,32)" opacity="0.07"/>
+    <use href="#paw" transform="translate(40,420) scale(0.45) rotate(10,32,32)" opacity="0.09"/>
+    <use href="#paw" transform="translate(1540,420) scale(0.45) rotate(-10,32,32)" opacity="0.09"/>
+  </g>
+</svg>
