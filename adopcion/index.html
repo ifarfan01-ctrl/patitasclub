@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adopción — Patitas Club</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="adopcion.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="../index.html">🐾 Patitas Club</a>
+    <div id="authBox" class="auth-box">
+      <button id="loginBtn" class="link-btn">Iniciar sesión</button>
+      <button id="registerBtn" class="link-btn">Registrarse</button>
+    </div>
+  </header>
+
+  <section class="page-head">
+    <h1>Mascotas en adopción</h1>
+    <p>Animales reales esperando un hogar. Cualquiera puede ver esta lista;
+    para publicar una mascota necesitas una cuenta.</p>
+    <button id="publishBtn" class="restart-btn" hidden>+ Publicar mascota en adopción</button>
+  </section>
+
+  <section id="listings" class="listings">
+    <p id="listingsEmpty" class="listings-empty" hidden>Todavía no hay mascotas publicadas. ¡Sé el primero!</p>
+  </section>
+
+  <!-- Auth modal -->
+  <div id="authModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="closeAuthModal" aria-label="Cerrar">✕</button>
+      <h2 id="authTitle">Iniciar sesión</h2>
+      <form id="authForm" class="form">
+        <label>Correo
+          <input type="email" id="authEmail" required autocomplete="email">
+        </label>
+        <label>Contraseña
+          <input type="password" id="authPassword" required minlength="6" autocomplete="current-password">
+        </label>
+        <p id="authError" class="form-error" hidden></p>
+        <button type="submit" class="restart-btn" id="authSubmit">Iniciar sesión</button>
+      </form>
+      <p class="modal-switch">
+        <span id="authSwitchText">¿No tienes cuenta?</span>
+        <button type="button" id="authSwitchBtn" class="link-btn">Regístrate</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- Publish modal -->
+  <div id="publishModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="closePublishModal" aria-label="Cerrar">✕</button>
+      <h2>Publicar mascota en adopción</h2>
+      <form id="publishForm" class="form">
+        <label>Nombre
+          <input type="text" id="petName" required maxlength="40">
+        </label>
+        <label>Especie
+          <select id="petSpecies" required>
+            <option value="Perro">Perro</option>
+            <option value="Gato">Gato</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </label>
+        <label>Raza
+          <input type="text" id="petBreed" maxlength="40" placeholder="Ej: Mestizo">
+        </label>
+        <label>Edad (años)
+          <input type="number" id="petAge" min="0" max="30" step="1">
+        </label>
+        <label>Foto (URL, opcional)
+          <input type="url" id="petPhoto" placeholder="https://...">
+        </label>
+        <label>Descripción
+          <textarea id="petDescription" rows="3" maxlength="400" required placeholder="Personalidad, estado de salud, dónde está, cómo contactar..."></textarea>
+        </label>
+        <p id="publishError" class="form-error" hidden></p>
+        <button type="submit" class="restart-btn">Publicar</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="adopcion.js"></script>
+</body>
+</html>

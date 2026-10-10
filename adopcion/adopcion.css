@@ -1,0 +1,204 @@
+.topbar {
+  justify-content: space-between;
+}
+
+.logo {
+  text-decoration: none;
+}
+
+.auth-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--brand-dark);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+.user-email {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-right: 4px;
+}
+
+.page-head {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px 20px 10px;
+  text-align: center;
+}
+
+.page-head h1 {
+  margin: 0 0 10px;
+}
+
+.page-head p {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.restart-btn {
+  border: none;
+  padding: 10px 22px;
+  border-radius: 24px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-dark));
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.restart-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.listings {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 10px 20px 72px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.listings-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 0;
+}
+
+.pet-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pet-card img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  background: var(--bg);
+}
+
+.pet-card-body {
+  padding: 14px 16px 18px;
+}
+
+.pet-card-body h3 {
+  margin: 0 0 2px;
+  font-size: 1.1rem;
+}
+
+.pet-card-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+}
+
+.pet-card-desc {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 20px;
+}
+
+.modal-overlay:not([hidden]) {
+  display: flex;
+}
+
+.modal-card {
+  position: relative;
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 28px 24px 24px;
+  width: min(420px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-card h2 {
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.modal-switch {
+  text-align: center;
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.form input,
+.form select,
+.form textarea {
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(128,128,128,0.35);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+.form-error {
+  color: #e8663a;
+  font-size: 0.85rem;
+  margin: 0;
+}

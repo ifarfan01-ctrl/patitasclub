@@ -136,3 +136,16 @@ body {
   font-size: 0.95rem;
   line-height: 1.5;
 }
+
+.pillar-link {
+  display: inline-block;
+  margin-top: 14px;
+  color: var(--brand-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.pillar-link:hover {
+  text-decoration: underline;
+}
