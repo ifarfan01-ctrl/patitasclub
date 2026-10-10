@@ -1,0 +1,15 @@
+# Patitas Club
+
+> Plataforma chilena que conecta mascotas y personas: adopción responsable, cruza de animales y PatiMatch, una app tipo Tinder para hacer match entre mascotas y salir a pasear juntos.
+
+## Páginas principales
+
+- [Inicio](https://patitasclub.untalivan.cl/): Presentación del sitio y sus tres pilares: adopción, cruza de animales y PatiMatch.
+- [Adopción](https://patitasclub.untalivan.cl/adopcion/): Lista pública de mascotas reales en adopción, con nombre, especie, raza, edad y descripción. Publicar una mascota requiere crear una cuenta.
+- [Cruza de animales](https://patitasclub.untalivan.cl/cruza/): Lista pública de mascotas disponibles para cruza responsable, con especie, sexo, raza y edad. Publicar requiere cuenta.
+- [PatiMatch](https://patitasclub.untalivan.cl/patimatch/): App de swipe para mascotas. Requiere registrarse y subir el perfil de tu mascota (incluida su ubicación); muestra como candidatas solo mascotas de otros dueños dentro de 25 km, y al hacer match mutuo entrega la distancia y el correo del otro dueño para coordinar un paseo.
+
+## Notas
+
+- El registro e inicio de sesión se hacen con correo y contraseña (Firebase Authentication).
+- Las listas de mascotas se cargan dinámicamente desde una base de datos (Firestore); el contenido visible depende de lo que los usuarios hayan publicado en cada momento.
