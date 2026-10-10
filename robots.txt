@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://patitasclub.untalivan.cl/sitemap.xml
