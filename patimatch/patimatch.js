@@ -20,12 +20,20 @@ import {
   where,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
 const MAX_DISTANCE_KM = 25;
 
@@ -82,6 +90,9 @@ const petSubmit = document.getElementById("petSubmit");
 const closePetModal = document.getElementById("closePetModal");
 const captureLocationBtn = document.getElementById("captureLocationBtn");
 const locationStatus = document.getElementById("locationStatus");
+const petPhotoInput = document.getElementById("petPhoto");
+const petPhotoPreview = document.getElementById("petPhotoPreview");
+const photoStatus = document.getElementById("photoStatus");
 
 const matchOverlay = document.getElementById("matchOverlay");
 const matchPhotoMine = document.getElementById("matchPhotoMine");
@@ -255,9 +266,30 @@ addPetBtn.addEventListener("click", () => {
   locationStatus.textContent = "Ubicación: no capturada todavía (obligatoria).";
   locationStatus.classList.remove("ok");
   petSubmit.disabled = true;
+  petPhotoPreview.hidden = true;
+  petPhotoPreview.src = "";
+  photoStatus.hidden = true;
   petModal.hidden = false;
 });
 closePetModal.addEventListener("click", () => { petModal.hidden = true; });
+
+petPhotoInput.addEventListener("change", () => {
+  const file = petPhotoInput.files[0];
+  photoStatus.hidden = true;
+  if (!file) {
+    petPhotoPreview.hidden = true;
+    return;
+  }
+  if (file.size > MAX_PHOTO_BYTES) {
+    photoStatus.textContent = "La foto debe pesar menos de 5MB.";
+    photoStatus.hidden = false;
+    petPhotoInput.value = "";
+    petPhotoPreview.hidden = true;
+    return;
+  }
+  petPhotoPreview.src = URL.createObjectURL(file);
+  petPhotoPreview.hidden = false;
+});
 
 captureLocationBtn.addEventListener("click", () => {
   if (!navigator.geolocation) {
@@ -288,12 +320,22 @@ petForm.addEventListener("submit", async (e) => {
   petError.hidden = true;
   petSubmit.disabled = true;
   try {
+    let fotoUrl = "";
+    const file = petPhotoInput.files[0];
+    if (file) {
+      photoStatus.textContent = "Subiendo foto...";
+      photoStatus.hidden = false;
+      const photoRef = ref(storage, `pet-photos/${currentUser.uid}/${Date.now()}-${file.name}`);
+      await uploadBytes(photoRef, file);
+      fotoUrl = await getDownloadURL(photoRef);
+      photoStatus.hidden = true;
+    }
     const docRef = await addDoc(collection(db, "patimatch_pets"), {
       nombre: document.getElementById("petName").value.trim(),
       especie: document.getElementById("petSpecies").value,
       raza: document.getElementById("petBreed").value.trim(),
       edad: document.getElementById("petAge").value || null,
-      foto: document.getElementById("petPhoto").value.trim(),
+      foto: fotoUrl,
       descripcion: document.getElementById("petDescription").value.trim(),
       lat: capturedLocation.lat,
       lng: capturedLocation.lng,

@@ -171,16 +171,6 @@ body {
   gap: 6px;
 }
 
-.form-hint {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--muted);
-}
-
-.form-hint.ok {
-  color: #4ecb71;
-}
-
 /* Match overlay */
 .match-card {
   text-align: center;

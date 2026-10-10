@@ -95,9 +95,11 @@
         <label>Edad (años)
           <input type="number" id="petAge" min="0" max="30" step="1">
         </label>
-        <label>Foto (URL, opcional)
-          <input type="url" id="petPhoto" placeholder="https://...">
+        <label>Foto (opcional)
+          <input type="file" id="petPhoto" accept="image/*">
         </label>
+        <img id="petPhotoPreview" class="photo-preview" hidden alt="Vista previa de la foto">
+        <p id="photoStatus" class="form-hint" hidden></p>
         <label>Descripción
           <textarea id="petDescription" rows="3" maxlength="400" required placeholder="Personalidad, estado de salud, dónde está, cómo contactar..."></textarea>
         </label>

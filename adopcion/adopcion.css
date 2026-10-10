@@ -245,3 +245,21 @@
   font-size: 0.85rem;
   margin: 0;
 }
+
+.form-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.form-hint.ok {
+  color: #4ecb71;
+}
+
+.photo-preview {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: -6px;
+}

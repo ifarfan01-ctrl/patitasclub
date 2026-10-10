@@ -17,12 +17,20 @@ import {
   orderBy,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
 const authBox = document.getElementById("authBox");
 const loginBtn = document.getElementById("loginBtn");
@@ -45,6 +53,9 @@ const publishModal = document.getElementById("publishModal");
 const publishForm = document.getElementById("publishForm");
 const publishError = document.getElementById("publishError");
 const closePublishModal = document.getElementById("closePublishModal");
+const petPhotoInput = document.getElementById("petPhoto");
+const petPhotoPreview = document.getElementById("petPhotoPreview");
+const photoStatus = document.getElementById("photoStatus");
 
 const listingsEl = document.getElementById("listings");
 const listingsEmpty = document.getElementById("listingsEmpty");
@@ -149,9 +160,30 @@ onAuthStateChanged(auth, (user) => {
 publishBtn.addEventListener("click", () => {
   publishError.hidden = true;
   publishForm.reset();
+  petPhotoPreview.hidden = true;
+  petPhotoPreview.src = "";
+  photoStatus.hidden = true;
   publishModal.hidden = false;
 });
 closePublishModal.addEventListener("click", () => { publishModal.hidden = true; });
+
+petPhotoInput.addEventListener("change", () => {
+  const file = petPhotoInput.files[0];
+  photoStatus.hidden = true;
+  if (!file) {
+    petPhotoPreview.hidden = true;
+    return;
+  }
+  if (file.size > MAX_PHOTO_BYTES) {
+    photoStatus.textContent = "La foto debe pesar menos de 5MB.";
+    photoStatus.hidden = false;
+    petPhotoInput.value = "";
+    petPhotoPreview.hidden = true;
+    return;
+  }
+  petPhotoPreview.src = URL.createObjectURL(file);
+  petPhotoPreview.hidden = false;
+});
 
 publishForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -160,13 +192,23 @@ publishForm.addEventListener("submit", async (e) => {
   const submitBtn = publishForm.querySelector("button[type=submit]");
   submitBtn.disabled = true;
   try {
+    let fotoUrl = "";
+    const file = petPhotoInput.files[0];
+    if (file) {
+      photoStatus.textContent = "Subiendo foto...";
+      photoStatus.hidden = false;
+      const photoRef = ref(storage, `pet-photos/${currentUser.uid}/${Date.now()}-${file.name}`);
+      await uploadBytes(photoRef, file);
+      fotoUrl = await getDownloadURL(photoRef);
+      photoStatus.hidden = true;
+    }
     await addDoc(collection(db, "cruzas"), {
       nombre: document.getElementById("petName").value.trim(),
       especie: document.getElementById("petSpecies").value,
       sexo: document.getElementById("petSex").value,
       raza: document.getElementById("petBreed").value.trim(),
       edad: document.getElementById("petAge").value || null,
-      foto: document.getElementById("petPhoto").value.trim(),
+      foto: fotoUrl,
       descripcion: document.getElementById("petDescription").value.trim(),
       ownerUid: currentUser.uid,
       ownerEmail: currentUser.email,
