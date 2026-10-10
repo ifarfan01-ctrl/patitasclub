@@ -3,6 +3,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -20,10 +22,12 @@ import { firebaseConfig } from "../firebase-config.js";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
 const authBox = document.getElementById("authBox");
 const loginBtn = document.getElementById("loginBtn");
 const registerBtn = document.getElementById("registerBtn");
+const googleBtn = document.getElementById("googleBtn");
 const publishBtn = document.getElementById("publishBtn");
 
 const authModal = document.getElementById("authModal");
@@ -98,6 +102,22 @@ authForm.addEventListener("submit", async (e) => {
     authError.hidden = false;
   } finally {
     authSubmit.disabled = false;
+  }
+});
+
+googleBtn.addEventListener("click", async () => {
+  authError.hidden = true;
+  googleBtn.disabled = true;
+  try {
+    await signInWithPopup(auth, googleProvider);
+    authModal.hidden = true;
+  } catch (err) {
+    if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") {
+      authError.textContent = "No se pudo iniciar sesión con Google. Intenta de nuevo.";
+      authError.hidden = false;
+    }
+  } finally {
+    googleBtn.disabled = false;
   }
 });
 
