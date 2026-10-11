@@ -117,7 +117,7 @@
         <label class="form-full">Descripción
           <textarea id="petDescription" rows="3" maxlength="400" required placeholder="Personalidad, estado de salud, dónde está, cómo contactar..."></textarea>
         </label>
-        <label class="form-full">Dirección (obligatoria, privada — solo tú la ves)
+        <label class="form-full">Dirección (obligatoria — se mostrará en el mapa de búsqueda)
           <div id="addressAutocomplete" class="address-autocomplete"></div>
         </label>
         <p id="addressStatus" class="form-hint form-full" hidden></p>
@@ -132,7 +132,7 @@
     <div class="modal-card map-modal-card">
       <button class="modal-close" id="closeMapModal" aria-label="Cerrar">✕</button>
       <h2>Mascotas en el mapa</h2>
-      <p class="form-hint">📍 Las ubicaciones son aproximadas para proteger la privacidad de cada publicación.</p>
+      <p class="form-hint">📍 Las ubicaciones mostradas son la dirección exacta de cada publicación.</p>
       <div id="petsMap" class="pets-map"></div>
     </div>
   </div>

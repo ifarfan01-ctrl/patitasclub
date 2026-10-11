@@ -91,17 +91,6 @@ let mapInfoWindow = null;
 let mapMarkers = [];
 let userLocationMarker = null;
 
-// Desplaza una coordenada real una distancia aleatoria (por defecto ~500m)
-// para publicar una ubicación aproximada y no exponer la dirección real.
-function fuzzCoordinates(lat, lng, radiusMeters = 500) {
-  const radiusDeg = radiusMeters / 111320;
-  const angle = Math.random() * 2 * Math.PI;
-  const dist = radiusDeg * Math.sqrt(Math.random());
-  const dLat = dist * Math.cos(angle);
-  const dLng = (dist * Math.sin(angle)) / Math.cos((lat * Math.PI) / 180);
-  return { lat: lat + dLat, lng: lng + dLng };
-}
-
 function pawMarkerIcon() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="52" viewBox="0 0 40 52">
 <path d="M20 1C10 1 2 9 2 19c0 13 18 31 18 31s18-18 18-31C38 9 30 1 20 1z" fill="#ff8a5b" stroke="#ffffff" stroke-width="2"/>
@@ -412,9 +401,8 @@ publishForm.addEventListener("submit", async (e) => {
       descripcion: document.getElementById("petDescription").value.trim(),
     };
     if (selectedAddress) {
-      const fuzzed = fuzzCoordinates(selectedAddress.lat, selectedAddress.lng);
-      data.mapLat = fuzzed.lat;
-      data.mapLng = fuzzed.lng;
+      data.mapLat = selectedAddress.lat;
+      data.mapLng = selectedAddress.lng;
     }
     let petId = editingPetId;
     if (editingPetId) {
@@ -568,7 +556,7 @@ function renderListings() {
 
 // Las publicaciones creadas antes de esta función no tienen mapLat/mapLng.
 // Solo el dueño puede leer la dirección privada, así que cada mascota se
-// "autocompleta" con un pin aproximado la próxima vez que su dueño entra
+// "autocompleta" con su ubicación exacta la próxima vez que su dueño entra
 // a esta página con sesión iniciada.
 const backfilledIds = new Set();
 
@@ -586,8 +574,7 @@ async function backfillMissingMapCoords() {
       if (!privateSnap.exists()) continue;
       const { lat, lng } = privateSnap.data();
       if (typeof lat !== "number" || typeof lng !== "number") continue;
-      const fuzzed = fuzzCoordinates(lat, lng);
-      await updateDoc(doc(db, "mascotas", id), { mapLat: fuzzed.lat, mapLng: fuzzed.lng });
+      await updateDoc(doc(db, "mascotas", id), { mapLat: lat, mapLng: lng });
     } catch (err) {
       // Si falla, se reintenta en una próxima carga porque no se guardó.
     }
