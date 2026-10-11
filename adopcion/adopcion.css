@@ -354,3 +354,24 @@
   border-radius: 12px;
   margin-top: -6px;
 }
+
+.upsell-message {
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+.upsell-cta {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.restart-btn.limit-reached {
+  background: none;
+  border: 2px solid rgba(128,128,128,0.4);
+  color: var(--muted);
+}
+
+.contact-btn {
+  color: #25d366;
+}

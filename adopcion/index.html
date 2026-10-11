@@ -121,6 +121,9 @@
           <div id="addressAutocomplete" class="address-autocomplete"></div>
         </label>
         <p id="addressStatus" class="form-hint form-full" hidden></p>
+        <label class="form-full">WhatsApp de contacto (obligatorio — solo lo ven usuarios Patitas Plus)
+          <input type="tel" id="petPhone" required placeholder="+56 9 1234 5678">
+        </label>
         <p id="publishError" class="form-error form-full" hidden></p>
         <button type="submit" class="restart-btn form-full" id="publishSubmit">Publicar</button>
       </form>
@@ -134,6 +137,16 @@
       <h2>Mascotas en el mapa</h2>
       <p class="form-hint">📍 Las ubicaciones mostradas son la dirección exacta de cada publicación.</p>
       <div id="petsMap" class="pets-map"></div>
+    </div>
+  </div>
+
+  <!-- Patitas Plus upsell modal -->
+  <div id="upsellModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="closeUpsellModal" aria-label="Cerrar">✕</button>
+      <h2>🐾 Patitas Plus</h2>
+      <p id="upsellMessage" class="form-hint upsell-message"></p>
+      <a href="/patitas-plus/" class="restart-btn upsell-cta">Conocer Patitas Plus</a>
     </div>
   </div>
 

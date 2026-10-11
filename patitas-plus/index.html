@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patitas Plus — Patitas Club</title>
+<meta name="description" content="Hazte Patitas Plus: publica mascotas sin límite en Adopción y Cruza, busca mascotas en el mapa y contacta directamente a sus dueños.">
+<link rel="canonical" href="https://patitasclub.untalivan.cl/patitas-plus/">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="plus.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="../index.html">🐾 Patitas Club</a>
+    <div id="authBox" class="auth-box"></div>
+  </header>
+
+  <section class="plus-hero">
+    <h1>🐾 Patitas Plus</h1>
+    <p>Publica sin límite, encuentra mascotas cerca de ti en el mapa y contacta
+    directamente a quien las publicó.</p>
+    <p id="planStatus" class="plan-status" hidden>✓ Ya eres Patitas Plus</p>
+  </section>
+
+  <section class="plans">
+    <div class="plan-card">
+      <h2>Gratis</h2>
+      <p class="plan-price">$0</p>
+      <ul class="plan-features">
+        <li>✓ 1 mascota en Adopción</li>
+        <li>✓ 1 mascota en Cruza</li>
+        <li>✓ 1 mascota en PatiMatch</li>
+        <li class="muted">✕ Buscar en el mapa</li>
+        <li class="muted">✕ Contactar a otros dueños</li>
+      </ul>
+    </div>
+    <div class="plan-card plan-featured">
+      <h2>Patitas Plus</h2>
+      <p class="plan-price">$2.990<span>/mes</span></p>
+      <ul class="plan-features">
+        <li>✓ Mascotas sin límite en Adopción</li>
+        <li>✓ Mascotas sin límite en Cruza</li>
+        <li>✓ 1 mascota en PatiMatch</li>
+        <li>✓ Buscar en el mapa</li>
+        <li>✓ Contactar a otros dueños por WhatsApp</li>
+      </ul>
+      <button id="subscribeBtn" class="restart-btn">Suscribirme a Patitas Plus</button>
+      <p id="subscribeHint" class="plan-hint">Los pagos con Flow se están activando. Muy pronto podrás suscribirte aquí mismo.</p>
+    </div>
+  </section>
+
+  <script type="module" src="plus.js"></script>
+</body>
+</html>

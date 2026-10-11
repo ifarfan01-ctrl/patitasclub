@@ -31,6 +31,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
 import { attachAddressAutocomplete } from "../address-autocomplete.js";
+import { watchUserPlan } from "../plans.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -69,12 +70,25 @@ const petPhotoPreview = document.getElementById("petPhotoPreview");
 const photoStatus = document.getElementById("photoStatus");
 const addressContainer = document.getElementById("addressAutocomplete");
 const addressStatus = document.getElementById("addressStatus");
+const petPhoneInput = document.getElementById("petPhone");
 
 const listingsEl = document.getElementById("listings");
 const listingsEmpty = document.getElementById("listingsEmpty");
 
+const upsellModal = document.getElementById("upsellModal");
+const upsellMessage = document.getElementById("upsellMessage");
+const closeUpsellModal = document.getElementById("closeUpsellModal");
+
+function openUpsellModal(message) {
+  upsellMessage.textContent = message;
+  upsellModal.hidden = false;
+}
+closeUpsellModal.addEventListener("click", () => { upsellModal.hidden = true; });
+
 let authMode = "login"; // or "register"
 let currentUser = null;
+let currentPlan = "free";
+let unsubscribePlan = null;
 let editingPetId = null;
 let editingPetFoto = "";
 let editingHasAddress = false;
@@ -186,21 +200,55 @@ function renderAuthBox() {
     logoutBtn.addEventListener("click", () => signOut(auth));
     authBox.appendChild(span);
     authBox.appendChild(logoutBtn);
-    publishBtn.hidden = false;
   } else {
     authBox.appendChild(loginBtn);
     authBox.appendChild(registerBtn);
+  }
+}
+
+function ownPetCount() {
+  if (!currentUser) return 0;
+  return latestDocs.filter(({ data }) => data.ownerUid === currentUser.uid).length;
+}
+
+function limitReached() {
+  return currentPlan !== "plus" && ownPetCount() >= 1;
+}
+
+function updatePublishButtonState() {
+  if (!currentUser) {
     publishBtn.hidden = true;
+    return;
+  }
+  publishBtn.hidden = false;
+  if (limitReached()) {
+    publishBtn.textContent = "Límite alcanzado — hazte Plus";
+    publishBtn.classList.add("limit-reached");
+  } else {
+    publishBtn.textContent = "+ Publicar mascota para cruza";
+    publishBtn.classList.remove("limit-reached");
   }
 }
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   renderAuthBox();
+  if (unsubscribePlan) {
+    unsubscribePlan();
+    unsubscribePlan = null;
+  }
+  unsubscribePlan = watchUserPlan(db, user ? user.uid : null, (plan) => {
+    currentPlan = plan;
+    updatePublishButtonState();
+  });
   renderListings();
 });
 
 publishBtn.addEventListener("click", () => {
+  if (limitReached()) {
+    openUpsellModal("Ya tienes 1 mascota publicada para cruza. Hazte Patitas Plus para publicar sin límite.");
+    return;
+  }
   editingPetId = null;
   editingPetFoto = "";
   editingHasAddress = false;
@@ -287,6 +335,11 @@ publishForm.addEventListener("submit", async (e) => {
         updatedAt: serverTimestamp(),
       });
     }
+    await setDoc(doc(db, "cruzas", petId, "private", "contacto"), {
+      telefono: petPhoneInput.value.trim(),
+      ownerUid: currentUser.uid,
+      updatedAt: serverTimestamp(),
+    });
     publishModal.hidden = true;
   } catch (err) {
     publishError.textContent = "No se pudo guardar. Intenta de nuevo.";
@@ -333,6 +386,15 @@ async function openEditModal(petId, pet) {
   } catch (err) {
     // Si no se puede leer, el usuario puede volver a buscar su dirección.
   }
+
+  try {
+    const contactoSnap = await getDoc(doc(db, "cruzas", petId, "private", "contacto"));
+    if (contactoSnap.exists()) {
+      petPhoneInput.value = contactoSnap.data().telefono || "";
+    }
+  } catch (err) {
+    // Si no se puede leer, el usuario puede volver a escribir su contacto.
+  }
 }
 
 async function deletePet(petId, pet) {
@@ -342,6 +404,11 @@ async function deletePet(petId, pet) {
       await deleteDoc(doc(db, "cruzas", petId, "private", "info"));
     } catch (err) {
       // Puede no existir si nunca se guardó una dirección.
+    }
+    try {
+      await deleteDoc(doc(db, "cruzas", petId, "private", "contacto"));
+    } catch (err) {
+      // Puede no existir si nunca se guardó un contacto.
     }
     await deleteDoc(doc(db, "cruzas", petId));
     if (pet.foto && pet.foto.includes("firebasestorage.googleapis.com")) {
@@ -400,10 +467,39 @@ function petCard(petId, pet) {
     actions.appendChild(editBtn);
     actions.appendChild(deleteBtn);
     body.appendChild(actions);
+  } else {
+    const actions = document.createElement("div");
+    actions.className = "pet-card-actions";
+
+    const contactBtn = document.createElement("button");
+    contactBtn.className = "link-btn contact-btn";
+    contactBtn.textContent = "💬 Contactar";
+    contactBtn.addEventListener("click", () => handleContactClick(petId));
+
+    actions.appendChild(contactBtn);
+    body.appendChild(actions);
   }
 
   card.appendChild(body);
   return card;
+}
+
+async function handleContactClick(petId) {
+  if (currentPlan !== "plus") {
+    openUpsellModal("Contactar al dueño de una mascota es una función de Patitas Plus.");
+    return;
+  }
+  try {
+    const snap = await getDoc(doc(db, "cruzas", petId, "private", "contacto"));
+    const telefono = snap.exists() ? (snap.data().telefono || "").replace(/[^0-9+]/g, "") : "";
+    if (!telefono) {
+      alert("Este usuario no dejó un número de contacto.");
+      return;
+    }
+    window.open(`https://wa.me/${telefono.replace(/^\+/, "")}`, "_blank", "noopener");
+  } catch (err) {
+    alert("No se pudo obtener el contacto. Intenta de nuevo.");
+  }
 }
 
 function renderListings() {
@@ -412,6 +508,7 @@ function renderListings() {
   latestDocs.forEach(({ id, data }) => {
     listingsEl.appendChild(petCard(id, data));
   });
+  updatePublishButtonState();
 }
 
 const q = query(collection(db, "cruzas"), orderBy("createdAt", "desc"));
