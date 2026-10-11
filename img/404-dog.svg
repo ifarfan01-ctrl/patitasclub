@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 260">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff8a5b"/>
+      <stop offset="100%" stop-color="#e8663a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- trailing paw prints, wandering off -->
+  <g fill="#ff8a5b">
+    <g opacity="0.18" transform="translate(228,196) rotate(18) scale(0.55)">
+      <circle cx="14" cy="24" r="7"/><circle cx="27" cy="13" r="7.5"/><circle cx="41" cy="13" r="7.5"/><circle cx="54" cy="24" r="7"/><ellipse cx="34" cy="43" rx="18" ry="15"/>
+    </g>
+    <g opacity="0.28" transform="translate(255,160) rotate(10) scale(0.45)">
+      <circle cx="14" cy="24" r="7"/><circle cx="27" cy="13" r="7.5"/><circle cx="41" cy="13" r="7.5"/><circle cx="54" cy="24" r="7"/><ellipse cx="34" cy="43" rx="18" ry="15"/>
+    </g>
+    <g opacity="0.4" transform="translate(272,120) rotate(2) scale(0.35)">
+      <circle cx="14" cy="24" r="7"/><circle cx="27" cy="13" r="7.5"/><circle cx="41" cy="13" r="7.5"/><circle cx="54" cy="24" r="7"/><ellipse cx="34" cy="43" rx="18" ry="15"/>
+    </g>
+  </g>
+
+  <!-- question marks -->
+  <text x="88" y="52" font-family="Arial, sans-serif" font-weight="800" font-size="30" fill="#ff8a5b" opacity="0.9">?</text>
+  <text x="196" y="40" font-family="Arial, sans-serif" font-weight="800" font-size="22" fill="#ff8a5b" opacity="0.55">?</text>
+
+  <!-- dog body -->
+  <ellipse cx="150" cy="210" rx="70" ry="38" fill="url(#bodyGrad)"/>
+
+  <!-- tail -->
+  <path d="M 212 196 Q 250 180 244 150 Q 240 170 208 180 Z" fill="#e8663a"/>
+
+  <!-- front paws -->
+  <ellipse cx="118" cy="238" rx="14" ry="10" fill="#e8663a"/>
+  <ellipse cx="182" cy="238" rx="14" ry="10" fill="#e8663a"/>
+
+  <!-- ears -->
+  <ellipse cx="104" cy="92" rx="22" ry="34" fill="#c84a2c" transform="rotate(-18 104 92)"/>
+  <ellipse cx="196" cy="92" rx="22" ry="34" fill="#c84a2c" transform="rotate(18 196 92)"/>
+
+  <!-- head -->
+  <circle cx="150" cy="120" r="58" fill="url(#bodyGrad)"/>
+
+  <!-- face patch -->
+  <ellipse cx="150" cy="146" rx="34" ry="26" fill="#fff5ee"/>
+
+  <!-- eyes (confused: one raised) -->
+  <circle cx="128" cy="108" r="6" fill="#2b2b2b"/>
+  <circle cx="172" cy="112" r="6" fill="#2b2b2b"/>
+  <path d="M 118 92 Q 128 84 140 90" stroke="#2b2b2b" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- nose -->
+  <ellipse cx="150" cy="142" rx="10" ry="7" fill="#2b2b2b"/>
+
+  <!-- open confused mouth -->
+  <path d="M 150 149 Q 150 168 136 172 Q 150 180 164 172 Q 150 168 150 149 Z" fill="#c84a2c"/>
+
+  <!-- ground shadow -->
+  <ellipse cx="150" cy="252" rx="80" ry="7" fill="#000" opacity="0.15"/>
+</svg>
