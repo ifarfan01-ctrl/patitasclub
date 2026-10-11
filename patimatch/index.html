@@ -118,24 +118,24 @@
           </select>
         </label>
         <label>Raza
-          <input type="text" id="petBreed" maxlength="40" placeholder="Ej: Mestizo">
+          <input type="text" id="petBreed" required maxlength="40" placeholder="Ej: Mestizo">
         </label>
         <label>Edad (años)
-          <input type="number" id="petAge" min="0" max="30" step="1">
+          <input type="number" id="petAge" required min="0" max="30" step="1">
         </label>
-        <label>Foto (opcional)
-          <input type="file" id="petPhoto" accept="image/*">
+        <label>Foto
+          <input type="file" id="petPhoto" required accept="image/*">
         </label>
         <img id="petPhotoPreview" class="photo-preview" hidden alt="Vista previa de la foto">
         <p id="photoStatus" class="form-hint" hidden></p>
         <label>Descripción
-          <textarea id="petDescription" rows="3" maxlength="400" placeholder="Personalidad, tamaño, con qué mascotas se lleva bien..."></textarea>
+          <textarea id="petDescription" rows="3" maxlength="400" required placeholder="Personalidad, tamaño, con qué mascotas se lleva bien..."></textarea>
         </label>
         <div class="location-field">
           <button type="button" id="captureLocationBtn" class="link-btn">📍 Usar mi ubicación actual</button>
           <p id="locationStatus" class="form-hint">Ubicación: no capturada todavía (obligatoria).</p>
         </div>
-        <label>Dirección (privada, solo para ti)
+        <label>Dirección (obligatoria, privada — solo tú la ves)
           <div id="addressAutocomplete" class="address-autocomplete"></div>
         </label>
         <p id="addressStatus" class="form-hint" hidden></p>

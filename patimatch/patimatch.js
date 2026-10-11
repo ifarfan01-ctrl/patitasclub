@@ -121,6 +121,7 @@ let currentUser = null;
 let myPet = null; // {id, ...data}
 let editingMyPet = false;
 let editingPetFoto = "";
+let editingHasAddress = false;
 let selectedAddress = null;
 let capturedLocation = null; // {lat, lng}
 
@@ -286,10 +287,12 @@ async function loadMyPet() {
 addPetBtn.addEventListener("click", () => {
   editingMyPet = false;
   editingPetFoto = "";
+  editingHasAddress = false;
   petModalTitle.textContent = "Mi mascota";
   petSubmit.textContent = "Guardar mi mascota";
   petError.hidden = true;
   petForm.reset();
+  petPhotoInput.required = true;
   capturedLocation = null;
   locationStatus.textContent = "Ubicación: no capturada todavía (obligatoria).";
   locationStatus.classList.remove("ok");
@@ -302,10 +305,11 @@ addPetBtn.addEventListener("click", () => {
 });
 closePetModal.addEventListener("click", () => { petModal.hidden = true; });
 
-editMyPetBtn.addEventListener("click", () => {
+editMyPetBtn.addEventListener("click", async () => {
   if (!myPet) return;
   editingMyPet = true;
   editingPetFoto = myPet.foto || "";
+  editingHasAddress = false;
   petModalTitle.textContent = "Editar mi mascota";
   petSubmit.textContent = "Guardar cambios";
   petError.hidden = true;
@@ -315,6 +319,7 @@ editMyPetBtn.addEventListener("click", () => {
   document.getElementById("petBreed").value = myPet.raza || "";
   document.getElementById("petAge").value = myPet.edad || "";
   document.getElementById("petDescription").value = myPet.descripcion || "";
+  petPhotoInput.required = !myPet.foto;
   capturedLocation = (typeof myPet.lat === "number" && typeof myPet.lng === "number")
     ? { lat: myPet.lat, lng: myPet.lng }
     : null;
@@ -337,6 +342,18 @@ editMyPetBtn.addEventListener("click", () => {
   photoStatus.hidden = true;
   resetAddressField();
   petModal.hidden = false;
+
+  try {
+    const privateSnap = await getDoc(doc(db, "patimatch_pets", myPet.id, "private", "info"));
+    if (privateSnap.exists()) {
+      editingHasAddress = true;
+      addressStatus.textContent = `✓ ${privateSnap.data().direccion} (ya guardada)`;
+      addressStatus.hidden = false;
+      addressStatus.classList.add("ok");
+    }
+  } catch (err) {
+    // Si no se puede leer, el usuario puede volver a buscar su dirección.
+  }
 });
 
 deleteMyPetBtn.addEventListener("click", async () => {
@@ -408,6 +425,11 @@ petForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!capturedLocation) return;
   petError.hidden = true;
+  if (!selectedAddress && !editingHasAddress) {
+    petError.textContent = "La dirección es obligatoria.";
+    petError.hidden = false;
+    return;
+  }
   petSubmit.disabled = true;
   try {
     let fotoUrl = editingPetFoto;

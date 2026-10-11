@@ -15,6 +15,7 @@ import {
   updateDoc,
   deleteDoc,
   setDoc,
+  getDoc,
   doc,
   onSnapshot,
   query,
@@ -74,6 +75,7 @@ let authMode = "login"; // or "register"
 let currentUser = null;
 let editingPetId = null;
 let editingPetFoto = "";
+let editingHasAddress = false;
 let selectedAddress = null;
 let latestDocs = [];
 
@@ -187,10 +189,12 @@ onAuthStateChanged(auth, (user) => {
 publishBtn.addEventListener("click", () => {
   editingPetId = null;
   editingPetFoto = "";
+  editingHasAddress = false;
   publishTitle.textContent = "Publicar mascota para cruza";
   publishSubmit.textContent = "Publicar";
   publishError.hidden = true;
   publishForm.reset();
+  petPhotoInput.required = true;
   petPhotoPreview.hidden = true;
   petPhotoPreview.src = "";
   photoStatus.hidden = true;
@@ -221,6 +225,11 @@ publishForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!currentUser) return;
   publishError.hidden = true;
+  if (!selectedAddress && !editingHasAddress) {
+    publishError.textContent = "La dirección es obligatoria.";
+    publishError.hidden = false;
+    return;
+  }
   const submitBtn = publishForm.querySelector("button[type=submit]");
   submitBtn.disabled = true;
   try {
@@ -273,9 +282,10 @@ publishForm.addEventListener("submit", async (e) => {
   }
 });
 
-function openEditModal(petId, pet) {
+async function openEditModal(petId, pet) {
   editingPetId = petId;
   editingPetFoto = pet.foto || "";
+  editingHasAddress = false;
   publishTitle.textContent = "Editar mascota";
   publishSubmit.textContent = "Guardar cambios";
   publishError.hidden = true;
@@ -286,6 +296,7 @@ function openEditModal(petId, pet) {
   document.getElementById("petBreed").value = pet.raza || "";
   document.getElementById("petAge").value = pet.edad || "";
   document.getElementById("petDescription").value = pet.descripcion || "";
+  petPhotoInput.required = !pet.foto;
   if (pet.foto) {
     petPhotoPreview.src = pet.foto;
     petPhotoPreview.hidden = false;
@@ -296,6 +307,18 @@ function openEditModal(petId, pet) {
   photoStatus.hidden = true;
   resetAddressField();
   publishModal.hidden = false;
+
+  try {
+    const privateSnap = await getDoc(doc(db, "cruzas", petId, "private", "info"));
+    if (privateSnap.exists()) {
+      editingHasAddress = true;
+      addressStatus.textContent = `✓ ${privateSnap.data().direccion} (ya guardada)`;
+      addressStatus.hidden = false;
+      addressStatus.classList.add("ok");
+    }
+  } catch (err) {
+    // Si no se puede leer, el usuario puede volver a buscar su dirección.
+  }
 }
 
 async function deletePet(petId, pet) {
