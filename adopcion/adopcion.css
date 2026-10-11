@@ -66,6 +66,19 @@
   cursor: not-allowed;
 }
 
+.restart-btn.secondary {
+  background: none;
+  border: 2px solid var(--brand);
+  color: var(--brand-dark);
+}
+
+.page-head-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .listings {
   max-width: 1040px;
   margin: 0 auto;
@@ -165,6 +178,18 @@
 #publishModal .modal-card,
 #petModal .modal-card {
   width: min(480px, 100%);
+}
+
+.map-modal-card {
+  width: min(640px, 100%);
+}
+
+.pets-map {
+  width: 100%;
+  height: min(420px, 60vh);
+  border-radius: 12px;
+  margin-top: 10px;
+  background: var(--bg);
 }
 
 .modal-card h2 {

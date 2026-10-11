@@ -34,7 +34,10 @@
     <h1>Mascotas en adopción</h1>
     <p>Animales reales esperando un hogar. Cualquiera puede ver esta lista;
     para publicar una mascota necesitas una cuenta.</p>
-    <button id="publishBtn" class="restart-btn" hidden>+ Publicar mascota en adopción</button>
+    <div class="page-head-actions">
+      <button id="publishBtn" class="restart-btn" hidden>+ Publicar mascota en adopción</button>
+      <button id="mapBtn" class="restart-btn secondary">🗺️ Buscar mascota en el mapa</button>
+    </div>
   </section>
 
   <section id="listings" class="listings">
@@ -121,6 +124,16 @@
         <p id="publishError" class="form-error form-full" hidden></p>
         <button type="submit" class="restart-btn form-full" id="publishSubmit">Publicar</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Map modal -->
+  <div id="mapModal" class="modal-overlay" hidden>
+    <div class="modal-card map-modal-card">
+      <button class="modal-close" id="closeMapModal" aria-label="Cerrar">✕</button>
+      <h2>Mascotas en el mapa</h2>
+      <p class="form-hint">📍 Las ubicaciones son aproximadas para proteger la privacidad de cada publicación.</p>
+      <div id="petsMap" class="pets-map"></div>
     </div>
   </div>
 

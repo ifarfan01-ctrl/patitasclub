@@ -2,7 +2,7 @@ import { GOOGLE_MAPS_API_KEY } from "./maps-config.js";
 
 let loaderPromise = null;
 
-function loadGoogleMapsBootstrap() {
+export function loadGoogleMapsBootstrap() {
   if (loaderPromise) return loaderPromise;
   loaderPromise = new Promise((resolve) => {
     if (window.google?.maps?.importLibrary) {
