@@ -551,29 +551,30 @@ function renderListings() {
     listingsEl.appendChild(petCard(id, data));
   });
   if (mapInstance && !mapModal.hidden) renderMapMarkers();
-  backfillMissingMapCoords();
+  syncOwnedMapCoords();
 }
 
-// Las publicaciones creadas antes de esta función no tienen mapLat/mapLng.
-// Solo el dueño puede leer la dirección privada, así que cada mascota se
-// "autocompleta" con su ubicación exacta la próxima vez que su dueño entra
-// a esta página con sesión iniciada.
-const backfilledIds = new Set();
+// Mantiene mapLat/mapLng al día con la dirección privada real de cada
+// mascota del dueño (cubre publicaciones sin pin todavía, y también las
+// que quedaron con la ubicación aproximada de una versión anterior).
+// Solo el dueño puede leer su dirección privada, así que esto solo corrige
+// sus propias mascotas, la próxima vez que entra a esta página con sesión
+// iniciada.
+const syncedIds = new Set();
 
-async function backfillMissingMapCoords() {
+async function syncOwnedMapCoords() {
   if (!currentUser) return;
   const targets = latestDocs.filter(({ id, data }) =>
-    data.ownerUid === currentUser.uid &&
-    (typeof data.mapLat !== "number" || typeof data.mapLng !== "number") &&
-    !backfilledIds.has(id)
+    data.ownerUid === currentUser.uid && !syncedIds.has(id)
   );
-  for (const { id } of targets) {
-    backfilledIds.add(id);
+  for (const { id, data } of targets) {
+    syncedIds.add(id);
     try {
       const privateSnap = await getDoc(doc(db, "mascotas", id, "private", "info"));
       if (!privateSnap.exists()) continue;
       const { lat, lng } = privateSnap.data();
       if (typeof lat !== "number" || typeof lng !== "number") continue;
+      if (data.mapLat === lat && data.mapLng === lng) continue;
       await updateDoc(doc(db, "mascotas", id), { mapLat: lat, mapLng: lng });
     } catch (err) {
       // Si falla, se reintenta en una próxima carga porque no se guardó.
