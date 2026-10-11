@@ -44,16 +44,3 @@ export async function attachAddressAutocomplete(container, onSelect) {
   });
   return el;
 }
-
-/**
- * Reverse-geocodes {lat, lng} into a formatted address.
- * Returns { direccion, lat, lng } or null if nothing was found.
- */
-export async function reverseGeocode(lat, lng) {
-  await loadGoogleMapsBootstrap();
-  const { Geocoder } = await google.maps.importLibrary("geocoding");
-  const geocoder = new Geocoder();
-  const { results } = await geocoder.geocode({ location: { lat, lng } });
-  if (!results || !results.length) return null;
-  return { direccion: results[0].formatted_address, lat, lng };
-}
