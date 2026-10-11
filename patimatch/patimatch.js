@@ -30,7 +30,7 @@ import {
   deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
-import { attachAddressAutocomplete } from "../address-autocomplete.js";
+import { attachAddressAutocomplete, reverseGeocode } from "../address-autocomplete.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -388,11 +388,24 @@ captureLocationBtn.addEventListener("click", () => {
   }
   locationStatus.textContent = "Obteniendo ubicación...";
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
+    async (pos) => {
       capturedLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       locationStatus.textContent = "✓ Ubicación capturada.";
       locationStatus.classList.add("ok");
       petSubmit.disabled = false;
+
+      try {
+        const addr = await reverseGeocode(capturedLocation.lat, capturedLocation.lng);
+        if (addr) {
+          selectedAddress = addr;
+          addressStatus.textContent = `✓ ${addr.direccion}`;
+          addressStatus.hidden = false;
+          addressStatus.classList.add("ok");
+        }
+      } catch (err) {
+        // Si falla el geocodificado inverso, el usuario igual puede
+        // buscar su dirección manualmente en el campo de abajo.
+      }
     },
     () => {
       capturedLocation = null;
