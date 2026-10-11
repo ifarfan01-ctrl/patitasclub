@@ -563,6 +563,35 @@ function renderListings() {
     listingsEl.appendChild(petCard(id, data));
   });
   if (mapInstance && !mapModal.hidden) renderMapMarkers();
+  backfillMissingMapCoords();
+}
+
+// Las publicaciones creadas antes de esta función no tienen mapLat/mapLng.
+// Solo el dueño puede leer la dirección privada, así que cada mascota se
+// "autocompleta" con un pin aproximado la próxima vez que su dueño entra
+// a esta página con sesión iniciada.
+const backfilledIds = new Set();
+
+async function backfillMissingMapCoords() {
+  if (!currentUser) return;
+  const targets = latestDocs.filter(({ id, data }) =>
+    data.ownerUid === currentUser.uid &&
+    (typeof data.mapLat !== "number" || typeof data.mapLng !== "number") &&
+    !backfilledIds.has(id)
+  );
+  for (const { id } of targets) {
+    backfilledIds.add(id);
+    try {
+      const privateSnap = await getDoc(doc(db, "mascotas", id, "private", "info"));
+      if (!privateSnap.exists()) continue;
+      const { lat, lng } = privateSnap.data();
+      if (typeof lat !== "number" || typeof lng !== "number") continue;
+      const fuzzed = fuzzCoordinates(lat, lng);
+      await updateDoc(doc(db, "mascotas", id), { mapLat: fuzzed.lat, mapLng: fuzzed.lng });
+    } catch (err) {
+      // Si falla, se reintenta en una próxima carga porque no se guardó.
+    }
+  }
 }
 
 const q = query(collection(db, "mascotas"), orderBy("createdAt", "desc"));
