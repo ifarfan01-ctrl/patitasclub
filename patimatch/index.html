@@ -91,6 +91,10 @@
         <label>Contraseña
           <input type="password" id="authPassword" required minlength="6" autocomplete="current-password">
         </label>
+        <label class="terms-check" id="termsCheckRow" hidden>
+          <input type="checkbox" id="acceptTerms">
+          <span>He leído y acepto los <a href="/terminos.html" target="_blank" rel="noopener">Términos y Condiciones</a>.</span>
+        </label>
         <p id="authError" class="form-error" hidden></p>
         <button type="submit" class="restart-btn" id="authSubmit">Iniciar sesión</button>
       </form>
@@ -137,16 +141,12 @@
         <label class="form-full">Descripción
           <textarea id="petDescription" rows="3" maxlength="400" required placeholder="Personalidad, tamaño, con qué mascotas se lleva bien..."></textarea>
         </label>
-        <div class="location-field form-full">
-          <button type="button" id="captureLocationBtn" class="link-btn">📍 Usar mi ubicación actual</button>
-          <p id="locationStatus" class="form-hint">Ubicación: no capturada todavía (obligatoria).</p>
-        </div>
-        <label class="form-full">Dirección (obligatoria, privada — solo tú la ves)
+        <label class="form-full">Dirección (obligatoria, privada — la usamos para mostrarte matches cercanos)
           <div id="addressAutocomplete" class="address-autocomplete"></div>
         </label>
         <p id="addressStatus" class="form-hint form-full" hidden></p>
         <p id="petError" class="form-error form-full" hidden></p>
-        <button type="submit" class="restart-btn form-full" id="petSubmit" disabled>Guardar mi mascota</button>
+        <button type="submit" class="restart-btn form-full" id="petSubmit">Guardar mi mascota</button>
       </form>
     </div>
   </div>

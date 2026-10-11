@@ -1,0 +1,40 @@
+.legal {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 20px 60px;
+}
+
+.legal h1 {
+  font-size: 1.6rem;
+  margin: 0 0 4px;
+}
+
+.legal-updated {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0 0 24px;
+}
+
+.legal h2 {
+  font-size: 1.1rem;
+  margin: 28px 0 8px;
+  color: var(--brand-dark);
+}
+
+.legal p,
+.legal li {
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.legal ul {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+
+.legal-back {
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 20px;
+}

@@ -63,6 +63,10 @@
         <label>Contraseña
           <input type="password" id="authPassword" required minlength="6" autocomplete="current-password">
         </label>
+        <label class="terms-check" id="termsCheckRow" hidden>
+          <input type="checkbox" id="acceptTerms">
+          <span>He leído y acepto los <a href="/terminos.html" target="_blank" rel="noopener">Términos y Condiciones</a>.</span>
+        </label>
         <p id="authError" class="form-error" hidden></p>
         <button type="submit" class="restart-btn" id="authSubmit">Iniciar sesión</button>
       </form>

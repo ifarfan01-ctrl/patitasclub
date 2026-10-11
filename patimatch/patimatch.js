@@ -88,6 +88,8 @@ const authSubmit = document.getElementById("authSubmit");
 const authSwitchText = document.getElementById("authSwitchText");
 const authSwitchBtn = document.getElementById("authSwitchBtn");
 const closeAuthModal = document.getElementById("closeAuthModal");
+const termsCheckRow = document.getElementById("termsCheckRow");
+const acceptTerms = document.getElementById("acceptTerms");
 
 const petModal = document.getElementById("petModal");
 const petModalTitle = document.getElementById("petModalTitle");
@@ -95,8 +97,6 @@ const petForm = document.getElementById("petForm");
 const petError = document.getElementById("petError");
 const petSubmit = document.getElementById("petSubmit");
 const closePetModal = document.getElementById("closePetModal");
-const captureLocationBtn = document.getElementById("captureLocationBtn");
-const locationStatus = document.getElementById("locationStatus");
 const petPhotoInput = document.getElementById("petPhoto");
 const petPhotoPreview = document.getElementById("petPhotoPreview");
 const photoStatus = document.getElementById("photoStatus");
@@ -123,7 +123,8 @@ let editingMyPet = false;
 let editingPetFoto = "";
 let editingHasAddress = false;
 let selectedAddress = null;
-let capturedLocation = null; // {lat, lng}
+let editingLat = null;
+let editingLng = null;
 
 function resetAddressField() {
   selectedAddress = null;
@@ -156,6 +157,8 @@ function openAuthModal(mode) {
   authMode = mode;
   authError.hidden = true;
   authForm.reset();
+  termsCheckRow.hidden = mode !== "register";
+  acceptTerms.checked = false;
   if (mode === "login") {
     authTitle.textContent = "Iniciar sesión";
     authSubmit.textContent = "Iniciar sesión";
@@ -189,6 +192,11 @@ const AUTH_ERROR_MESSAGES = {
 authForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   authError.hidden = true;
+  if (authMode === "register" && !acceptTerms.checked) {
+    authError.textContent = "Debes aceptar los Términos y Condiciones.";
+    authError.hidden = false;
+    return;
+  }
   authSubmit.disabled = true;
   const email = authEmail.value.trim();
   const password = authPassword.value;
@@ -209,6 +217,11 @@ authForm.addEventListener("submit", async (e) => {
 
 googleBtn.addEventListener("click", async () => {
   authError.hidden = true;
+  if (authMode === "register" && !acceptTerms.checked) {
+    authError.textContent = "Debes aceptar los Términos y Condiciones.";
+    authError.hidden = false;
+    return;
+  }
   googleBtn.disabled = true;
   try {
     await signInWithPopup(auth, googleProvider);
@@ -293,10 +306,8 @@ addPetBtn.addEventListener("click", () => {
   petError.hidden = true;
   petForm.reset();
   petPhotoInput.required = true;
-  capturedLocation = null;
-  locationStatus.textContent = "Ubicación: no capturada todavía (obligatoria).";
-  locationStatus.classList.remove("ok");
-  petSubmit.disabled = true;
+  editingLat = null;
+  editingLng = null;
   petPhotoPreview.hidden = true;
   petPhotoPreview.src = "";
   photoStatus.hidden = true;
@@ -321,18 +332,8 @@ editMyPetBtn.addEventListener("click", async () => {
   document.getElementById("petAge").value = myPet.edad || "";
   document.getElementById("petDescription").value = myPet.descripcion || "";
   petPhotoInput.required = !myPet.foto;
-  capturedLocation = (typeof myPet.lat === "number" && typeof myPet.lng === "number")
-    ? { lat: myPet.lat, lng: myPet.lng }
-    : null;
-  if (capturedLocation) {
-    locationStatus.textContent = "✓ Ubicación actual guardada (puedes actualizarla).";
-    locationStatus.classList.add("ok");
-    petSubmit.disabled = false;
-  } else {
-    locationStatus.textContent = "Ubicación: no capturada todavía (obligatoria).";
-    locationStatus.classList.remove("ok");
-    petSubmit.disabled = true;
-  }
+  editingLat = typeof myPet.lat === "number" ? myPet.lat : null;
+  editingLng = typeof myPet.lng === "number" ? myPet.lng : null;
   if (myPet.foto) {
     petPhotoPreview.src = myPet.foto;
     petPhotoPreview.hidden = false;
@@ -399,32 +400,8 @@ petPhotoInput.addEventListener("change", () => {
   petPhotoPreview.hidden = false;
 });
 
-captureLocationBtn.addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    locationStatus.textContent = "Tu navegador no soporta geolocalización.";
-    return;
-  }
-  locationStatus.textContent = "Obteniendo ubicación...";
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      capturedLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      locationStatus.textContent = "✓ Ubicación capturada.";
-      locationStatus.classList.add("ok");
-      petSubmit.disabled = false;
-    },
-    () => {
-      capturedLocation = null;
-      locationStatus.textContent = "No pudimos obtener tu ubicación. Revisa los permisos del navegador e intenta de nuevo.";
-      locationStatus.classList.remove("ok");
-      petSubmit.disabled = true;
-    },
-    { enableHighAccuracy: true, timeout: 10000 }
-  );
-});
-
 petForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!capturedLocation) return;
   petError.hidden = true;
   if (!selectedAddress && !editingHasAddress) {
     petError.textContent = "La dirección es obligatoria.";
@@ -451,8 +428,8 @@ petForm.addEventListener("submit", async (e) => {
       edad: document.getElementById("petAge").value || null,
       foto: fotoUrl,
       descripcion: document.getElementById("petDescription").value.trim(),
-      lat: capturedLocation.lat,
-      lng: capturedLocation.lng,
+      lat: selectedAddress ? selectedAddress.lat : editingLat,
+      lng: selectedAddress ? selectedAddress.lng : editingLng,
     };
     let petId;
     if (editingMyPet && myPet) {

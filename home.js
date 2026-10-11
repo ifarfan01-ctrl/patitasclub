@@ -29,6 +29,8 @@ const authSubmit = document.getElementById("authSubmit");
 const authSwitchText = document.getElementById("authSwitchText");
 const authSwitchBtn = document.getElementById("authSwitchBtn");
 const closeAuthModal = document.getElementById("closeAuthModal");
+const termsCheckRow = document.getElementById("termsCheckRow");
+const acceptTerms = document.getElementById("acceptTerms");
 
 let authMode = "login";
 
@@ -36,6 +38,8 @@ function openAuthModal(mode) {
   authMode = mode;
   authError.hidden = true;
   authForm.reset();
+  termsCheckRow.hidden = mode !== "register";
+  acceptTerms.checked = false;
   if (mode === "login") {
     authTitle.textContent = "Iniciar sesión";
     authSubmit.textContent = "Iniciar sesión";
@@ -67,6 +71,11 @@ const AUTH_ERROR_MESSAGES = {
 authForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   authError.hidden = true;
+  if (authMode === "register" && !acceptTerms.checked) {
+    authError.textContent = "Debes aceptar los Términos y Condiciones.";
+    authError.hidden = false;
+    return;
+  }
   authSubmit.disabled = true;
   const email = authEmail.value.trim();
   const password = authPassword.value;
@@ -87,6 +96,11 @@ authForm.addEventListener("submit", async (e) => {
 
 googleBtn.addEventListener("click", async () => {
   authError.hidden = true;
+  if (authMode === "register" && !acceptTerms.checked) {
+    authError.textContent = "Debes aceptar los Términos y Condiciones.";
+    authError.hidden = false;
+    return;
+  }
   googleBtn.disabled = true;
   try {
     await signInWithPopup(auth, googleProvider);

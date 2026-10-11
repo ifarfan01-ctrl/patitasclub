@@ -190,6 +190,26 @@
   color: var(--muted);
 }
 
+.terms-check {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.terms-check input {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.terms-check a {
+  color: var(--brand-dark);
+  font-weight: 600;
+}
+
 .google-btn {
   display: flex;
   align-items: center;

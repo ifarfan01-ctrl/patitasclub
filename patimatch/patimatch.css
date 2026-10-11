@@ -171,12 +171,6 @@ body {
 .action-btn.pass { color: #ff4747; }
 .action-btn.like { color: #4ecb71; }
 
-.location-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 /* Match overlay */
 .match-card {
   text-align: center;
