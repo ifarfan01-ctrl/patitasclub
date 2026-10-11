@@ -156,10 +156,15 @@
   background: var(--card-bg);
   border-radius: 16px;
   box-shadow: var(--shadow);
-  padding: 28px 24px 24px;
-  width: min(420px, 100%);
+  padding: 24px 22px 20px;
+  width: min(460px, 100%);
   max-height: 90vh;
   overflow-y: auto;
+}
+
+#publishModal .modal-card,
+#petModal .modal-card {
+  width: min(480px, 100%);
 }
 
 .modal-card h2 {
@@ -231,14 +236,25 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+}
+
+#publishModal .form,
+#petModal .form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.form-full {
+  grid-column: 1 / -1;
 }
 
 .form label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 0.9rem;
+  gap: 4px;
+  font-size: 0.85rem;
   color: var(--muted);
 }
 
@@ -246,7 +262,7 @@
 .form select,
 .form textarea {
   font: inherit;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid rgba(128,128,128,0.35);
   background: var(--bg);
@@ -255,6 +271,11 @@
 
 .form textarea {
   resize: vertical;
+}
+
+#publishModal .modal-card h2,
+#petModal .modal-card h2 {
+  margin-bottom: 12px;
 }
 
 .address-autocomplete {

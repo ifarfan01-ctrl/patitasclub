@@ -246,6 +246,7 @@ publishForm.addEventListener("submit", async (e) => {
     const data = {
       nombre: document.getElementById("petName").value.trim(),
       especie: document.getElementById("petSpecies").value,
+      sexo: document.getElementById("petSex").value,
       raza: document.getElementById("petBreed").value.trim(),
       edad: document.getElementById("petAge").value || null,
       foto: fotoUrl,
@@ -291,6 +292,7 @@ async function openEditModal(petId, pet) {
   publishForm.reset();
   document.getElementById("petName").value = pet.nombre || "";
   document.getElementById("petSpecies").value = pet.especie || "Perro";
+  document.getElementById("petSex").value = pet.sexo || "Macho";
   document.getElementById("petBreed").value = pet.raza || "";
   document.getElementById("petAge").value = pet.edad || "";
   document.getElementById("petDescription").value = pet.descripcion || "";
@@ -358,7 +360,7 @@ function petCard(petId, pet) {
 
   const meta = document.createElement("p");
   meta.className = "pet-card-meta";
-  const parts = [pet.especie, pet.raza, pet.edad ? `${pet.edad} años` : null].filter(Boolean);
+  const parts = [pet.especie, pet.sexo, pet.raza, pet.edad ? `${pet.edad} años` : null].filter(Boolean);
   meta.textContent = parts.join(" · ");
   body.appendChild(meta);
 

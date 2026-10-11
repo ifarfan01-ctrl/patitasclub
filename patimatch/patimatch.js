@@ -316,6 +316,7 @@ editMyPetBtn.addEventListener("click", async () => {
   petForm.reset();
   document.getElementById("petName").value = myPet.nombre || "";
   document.getElementById("petSpecies").value = myPet.especie || "Perro";
+  document.getElementById("petSex").value = myPet.sexo || "Macho";
   document.getElementById("petBreed").value = myPet.raza || "";
   document.getElementById("petAge").value = myPet.edad || "";
   document.getElementById("petDescription").value = myPet.descripcion || "";
@@ -445,6 +446,7 @@ petForm.addEventListener("submit", async (e) => {
     const data = {
       nombre: document.getElementById("petName").value.trim(),
       especie: document.getElementById("petSpecies").value,
+      sexo: document.getElementById("petSex").value,
       raza: document.getElementById("petBreed").value.trim(),
       edad: document.getElementById("petAge").value || null,
       foto: fotoUrl,
@@ -539,7 +541,7 @@ function buildCard(pet, interactive) {
 
   const info = document.createElement("div");
   info.className = "card-info";
-  const parts = [pet.especie, pet.raza, pet.edad ? `${pet.edad} años` : null].filter(Boolean);
+  const parts = [pet.especie, pet.sexo, pet.raza, pet.edad ? `${pet.edad} años` : null].filter(Boolean);
   info.innerHTML = `<h2>${pet.nombre}</h2><p>${parts.join(" · ")}</p><p class="card-distance">📍 ${fmtDistance(pet.distanceKm)} de distancia</p>`;
   card.appendChild(info);
 
