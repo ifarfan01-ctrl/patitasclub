@@ -103,6 +103,10 @@
         <label>Descripción
           <textarea id="petDescription" rows="3" maxlength="400" required placeholder="Personalidad, estado de salud, dónde está, cómo contactar..."></textarea>
         </label>
+        <label>Dirección (privada, solo para ti)
+          <div id="addressAutocomplete" class="address-autocomplete"></div>
+        </label>
+        <p id="addressStatus" class="form-hint" hidden></p>
         <p id="publishError" class="form-error" hidden></p>
         <button type="submit" class="restart-btn" id="publishSubmit">Publicar</button>
       </form>

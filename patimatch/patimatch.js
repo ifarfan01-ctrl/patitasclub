@@ -30,6 +30,7 @@ import {
   deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
+import { attachAddressAutocomplete } from "../address-autocomplete.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -99,6 +100,8 @@ const locationStatus = document.getElementById("locationStatus");
 const petPhotoInput = document.getElementById("petPhoto");
 const petPhotoPreview = document.getElementById("petPhotoPreview");
 const photoStatus = document.getElementById("photoStatus");
+const addressContainer = document.getElementById("addressAutocomplete");
+const addressStatus = document.getElementById("addressStatus");
 
 const matchOverlay = document.getElementById("matchOverlay");
 const matchPhotoMine = document.getElementById("matchPhotoMine");
@@ -118,7 +121,20 @@ let currentUser = null;
 let myPet = null; // {id, ...data}
 let editingMyPet = false;
 let editingPetFoto = "";
+let selectedAddress = null;
 let capturedLocation = null; // {lat, lng}
+
+function resetAddressField() {
+  selectedAddress = null;
+  addressStatus.hidden = true;
+  addressStatus.classList.remove("ok");
+  attachAddressAutocomplete(addressContainer, (addr) => {
+    selectedAddress = addr;
+    addressStatus.textContent = `✓ ${addr.direccion}`;
+    addressStatus.hidden = false;
+    addressStatus.classList.add("ok");
+  });
+}
 let deckPets = []; // candidates to swipe, nearest first
 let isAnimating = false;
 
@@ -281,6 +297,7 @@ addPetBtn.addEventListener("click", () => {
   petPhotoPreview.hidden = true;
   petPhotoPreview.src = "";
   photoStatus.hidden = true;
+  resetAddressField();
   petModal.hidden = false;
 });
 closePetModal.addEventListener("click", () => { petModal.hidden = true; });
@@ -318,6 +335,7 @@ editMyPetBtn.addEventListener("click", () => {
     petPhotoPreview.src = "";
   }
   photoStatus.hidden = true;
+  resetAddressField();
   petModal.hidden = false;
 });
 
@@ -325,6 +343,11 @@ deleteMyPetBtn.addEventListener("click", async () => {
   if (!myPet) return;
   if (!confirm(`¿Borrar a ${myPet.nombre || "tu mascota"} de PatiMatch? Esta acción no se puede deshacer.`)) return;
   try {
+    try {
+      await deleteDoc(doc(db, "patimatch_pets", myPet.id, "private", "info"));
+    } catch (err) {
+      // Puede no existir si nunca se guardó una dirección.
+    }
     await deleteDoc(doc(db, "patimatch_pets", myPet.id));
     if (myPet.foto && myPet.foto.includes("firebasestorage.googleapis.com")) {
       try {
@@ -407,8 +430,10 @@ petForm.addEventListener("submit", async (e) => {
       lat: capturedLocation.lat,
       lng: capturedLocation.lng,
     };
+    let petId;
     if (editingMyPet && myPet) {
-      await updateDoc(doc(db, "patimatch_pets", myPet.id), data);
+      petId = myPet.id;
+      await updateDoc(doc(db, "patimatch_pets", petId), data);
     } else {
       const docRef = await addDoc(collection(db, "patimatch_pets"), {
         ...data,
@@ -416,7 +441,17 @@ petForm.addEventListener("submit", async (e) => {
         ownerEmail: currentUser.email,
         createdAt: serverTimestamp(),
       });
-      myPet = { id: docRef.id };
+      petId = docRef.id;
+      myPet = { id: petId };
+    }
+    if (selectedAddress) {
+      await setDoc(doc(db, "patimatch_pets", petId, "private", "info"), {
+        direccion: selectedAddress.direccion,
+        lat: selectedAddress.lat,
+        lng: selectedAddress.lng,
+        ownerUid: currentUser.uid,
+        updatedAt: serverTimestamp(),
+      });
     }
     petModal.hidden = true;
     await loadMyPet();

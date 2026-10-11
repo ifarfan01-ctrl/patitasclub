@@ -135,6 +135,10 @@
           <button type="button" id="captureLocationBtn" class="link-btn">📍 Usar mi ubicación actual</button>
           <p id="locationStatus" class="form-hint">Ubicación: no capturada todavía (obligatoria).</p>
         </div>
+        <label>Dirección (privada, solo para ti)
+          <div id="addressAutocomplete" class="address-autocomplete"></div>
+        </label>
+        <p id="addressStatus" class="form-hint" hidden></p>
         <p id="petError" class="form-error" hidden></p>
         <button type="submit" class="restart-btn" id="petSubmit" disabled>Guardar mi mascota</button>
       </form>

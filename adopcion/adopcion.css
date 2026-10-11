@@ -257,6 +257,14 @@
   resize: vertical;
 }
 
+.address-autocomplete {
+  width: 100%;
+}
+
+.address-autocomplete gmp-place-autocomplete {
+  width: 100%;
+}
+
 .form-error {
   color: #e8663a;
   font-size: 0.85rem;

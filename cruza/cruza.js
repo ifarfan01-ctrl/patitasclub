@@ -14,6 +14,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  setDoc,
   doc,
   onSnapshot,
   query,
@@ -28,6 +29,7 @@ import {
   deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
+import { attachAddressAutocomplete } from "../address-autocomplete.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -62,6 +64,8 @@ const closePublishModal = document.getElementById("closePublishModal");
 const petPhotoInput = document.getElementById("petPhoto");
 const petPhotoPreview = document.getElementById("petPhotoPreview");
 const photoStatus = document.getElementById("photoStatus");
+const addressContainer = document.getElementById("addressAutocomplete");
+const addressStatus = document.getElementById("addressStatus");
 
 const listingsEl = document.getElementById("listings");
 const listingsEmpty = document.getElementById("listingsEmpty");
@@ -70,7 +74,20 @@ let authMode = "login"; // or "register"
 let currentUser = null;
 let editingPetId = null;
 let editingPetFoto = "";
+let selectedAddress = null;
 let latestDocs = [];
+
+function resetAddressField() {
+  selectedAddress = null;
+  addressStatus.hidden = true;
+  addressStatus.classList.remove("ok");
+  attachAddressAutocomplete(addressContainer, (addr) => {
+    selectedAddress = addr;
+    addressStatus.textContent = `✓ ${addr.direccion}`;
+    addressStatus.hidden = false;
+    addressStatus.classList.add("ok");
+  });
+}
 
 function openAuthModal(mode) {
   authMode = mode;
@@ -177,6 +194,7 @@ publishBtn.addEventListener("click", () => {
   petPhotoPreview.hidden = true;
   petPhotoPreview.src = "";
   photoStatus.hidden = true;
+  resetAddressField();
   publishModal.hidden = false;
 });
 closePublishModal.addEventListener("click", () => { publishModal.hidden = true; });
@@ -225,14 +243,25 @@ publishForm.addEventListener("submit", async (e) => {
       foto: fotoUrl,
       descripcion: document.getElementById("petDescription").value.trim(),
     };
+    let petId = editingPetId;
     if (editingPetId) {
       await updateDoc(doc(db, "cruzas", editingPetId), data);
     } else {
-      await addDoc(collection(db, "cruzas"), {
+      const docRef = await addDoc(collection(db, "cruzas"), {
         ...data,
         ownerUid: currentUser.uid,
         ownerEmail: currentUser.email,
         createdAt: serverTimestamp(),
+      });
+      petId = docRef.id;
+    }
+    if (selectedAddress) {
+      await setDoc(doc(db, "cruzas", petId, "private", "info"), {
+        direccion: selectedAddress.direccion,
+        lat: selectedAddress.lat,
+        lng: selectedAddress.lng,
+        ownerUid: currentUser.uid,
+        updatedAt: serverTimestamp(),
       });
     }
     publishModal.hidden = true;
@@ -265,12 +294,18 @@ function openEditModal(petId, pet) {
     petPhotoPreview.src = "";
   }
   photoStatus.hidden = true;
+  resetAddressField();
   publishModal.hidden = false;
 }
 
 async function deletePet(petId, pet) {
   if (!confirm(`¿Borrar la publicación de ${pet.nombre || "esta mascota"}? Esta acción no se puede deshacer.`)) return;
   try {
+    try {
+      await deleteDoc(doc(db, "cruzas", petId, "private", "info"));
+    } catch (err) {
+      // Puede no existir si nunca se guardó una dirección.
+    }
     await deleteDoc(doc(db, "cruzas", petId));
     if (pet.foto && pet.foto.includes("firebasestorage.googleapis.com")) {
       try {
