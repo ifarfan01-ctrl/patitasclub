@@ -33,7 +33,9 @@ exports.startPlusCheckout = onCall({ secrets: [FLOW_API_KEY, FLOW_SECRET_KEY] },
   const apiKey = FLOW_API_KEY.value();
   const secretKey = FLOW_SECRET_KEY.value();
 
-  const commerceOrder = `plus_${uid}_${Date.now()}`;
+  // commerceOrder no puede superar 45 caracteres en Flow; no hace falta que
+  // incluya el uid porque flowPayments/{commerceOrder} ya guarda esa relación.
+  const commerceOrder = `plus_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
   const payment = await flowPost("/payment/create", {
     commerceOrder,
     subject: `Patitas Plus - ${PLUS_DAYS} días`,
