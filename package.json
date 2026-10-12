@@ -1,0 +1,29 @@
+{
+  "name": "patitasclub",
+  "version": "1.0.0",
+  "description": "Patitas Club: adopción, cruza de animales y Tinder Pet",
+  "main": "address-autocomplete.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:www": "bash scripts/build-www.sh",
+    "sync": "npm run build:www && npx cap sync"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ifarfan01-ctrl/patitasclub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ifarfan01-ctrl/patitasclub/issues"
+  },
+  "homepage": "https://github.com/ifarfan01-ctrl/patitasclub#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3"
+  }
+}
