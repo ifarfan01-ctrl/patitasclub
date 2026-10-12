@@ -16,7 +16,7 @@ const subscribeBtn = document.getElementById("subscribeBtn");
 const subscribeHint = document.getElementById("subscribeHint");
 
 let unsubscribePlan = null;
-let processingReturn = false;
+let waitingConfirmation = false;
 
 function renderAuthBox(user) {
   authBox.innerHTML = "";
@@ -47,32 +47,40 @@ async function startCheckout() {
   }
 }
 
-async function handleReturnFromFlow() {
-  processingReturn = true;
+function handleReturnFromFlow() {
+  waitingConfirmation = true;
   subscribeBtn.hidden = true;
   subscribeHint.hidden = false;
   subscribeHint.textContent = "Confirmando tu pago con Flow...";
-  try {
-    const complete = httpsCallable(functions, "completePlusSubscription");
-    await complete();
-    subscribeHint.textContent = "¡Listo! Activando tu plan Plus...";
-  } catch (err) {
-    processingReturn = false;
-    subscribeHint.textContent = "No se pudo confirmar el pago. Si ya pagaste, espera un minuto y recarga esta página.";
-  }
   const url = new URL(window.location.href);
   url.searchParams.delete("step");
   window.history.replaceState({}, "", url);
+  setTimeout(() => {
+    if (waitingConfirmation) {
+      subscribeHint.textContent = "Esto está tardando más de lo normal. Si ya pagaste, espera un momento y recarga la página.";
+    }
+  }, 20000);
 }
 
-function updateUI(user, plan) {
+function formatDate(timestamp) {
+  if (!timestamp) return "";
+  return timestamp.toDate().toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function updateUI(user, plan, expiresAt) {
   if (plan === "plus") {
+    waitingConfirmation = false;
     planStatus.hidden = false;
-    subscribeBtn.hidden = true;
-    subscribeHint.hidden = true;
+    planStatus.textContent = `✓ Patitas Plus activo hasta el ${formatDate(expiresAt)}`;
+    subscribeBtn.hidden = false;
+    subscribeBtn.disabled = false;
+    subscribeBtn.textContent = "Renovar Patitas Plus (+30 días)";
+    subscribeHint.hidden = false;
+    subscribeHint.textContent = "Patitas Plus se paga una vez al mes, no se renueva solo. Puedes renovar cuando quieras.";
+    subscribeBtn.onclick = startCheckout;
     return;
   }
-  if (processingReturn) return;
+  if (waitingConfirmation) return;
   planStatus.hidden = true;
   subscribeBtn.hidden = false;
   subscribeBtn.disabled = false;
@@ -83,7 +91,7 @@ function updateUI(user, plan) {
     subscribeBtn.onclick = () => { window.location.href = "../index.html"; };
   } else {
     subscribeBtn.textContent = "Suscribirme a Patitas Plus";
-    subscribeHint.textContent = "Pagas con Webpay/RedCompra a través de Flow.";
+    subscribeHint.textContent = "Pagas con Webpay/RedCompra a través de Flow. Dura 30 días.";
     subscribeBtn.onclick = startCheckout;
   }
 }
@@ -94,10 +102,10 @@ onAuthStateChanged(auth, (user) => {
     unsubscribePlan();
     unsubscribePlan = null;
   }
-  unsubscribePlan = watchUserPlan(db, user ? user.uid : null, (plan) => {
-    updateUI(user, plan);
+  unsubscribePlan = watchUserPlan(db, user ? user.uid : null, (plan, expiresAt) => {
+    updateUI(user, plan, expiresAt);
   });
-  if (user && new URLSearchParams(window.location.search).get("step") === "return" && !processingReturn) {
+  if (user && new URLSearchParams(window.location.search).get("step") === "return" && !waitingConfirmation) {
     handleReturnFromFlow();
   }
 });

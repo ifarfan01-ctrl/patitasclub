@@ -1,10 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Patitas Plus es un pago único por 30 días (no suscripción automática),
+    // así que además de plan == 'plus' hay que verificar que no haya vencido.
     function isPlus() {
       return request.auth != null
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.plan == 'plus';
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.plan == 'plus'
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.plusExpiresAt > request.time;
     }
 
     match /users/{uid} {

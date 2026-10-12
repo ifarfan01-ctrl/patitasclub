@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 
 const FLOW_BASE_URL = process.env.FLOW_BASE_URL || "https://www.flow.cl/api";
-const PLAN_ID = "patitas-plus-mensual";
 
 function sign(params, secretKey) {
   const keys = Object.keys(params).sort();
@@ -37,4 +36,4 @@ async function flowGet(path, params, apiKey, secretKey) {
   return data;
 }
 
-module.exports = { flowPost, flowGet, PLAN_ID, FLOW_BASE_URL };
+module.exports = { flowPost, flowGet, FLOW_BASE_URL };
