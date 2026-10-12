@@ -58,6 +58,7 @@
       <div class="my-pet-actions">
         <button id="editMyPetBtn" class="link-btn">Editar</button>
         <button id="deleteMyPetBtn" class="link-btn delete-btn">Borrar</button>
+        <button id="mapBtn" class="link-btn">🗺️ Mapa</button>
         <button id="myMatchesBtn" class="link-btn">Mis matches (<span id="matchCount">0</span>)</button>
       </div>
     </div>
@@ -164,6 +165,26 @@
       <p id="matchDistance" class="match-distance"></p>
       <p id="matchContact" class="match-contact"></p>
       <button id="closeMatch" class="restart-btn">Seguir viendo</button>
+    </div>
+  </div>
+
+  <!-- Map modal -->
+  <div id="mapModal" class="modal-overlay" hidden>
+    <div class="modal-card map-modal-card">
+      <button class="modal-close" id="closeMapModal" aria-label="Cerrar">✕</button>
+      <h2>Mascotas cerca de ti</h2>
+      <p class="form-hint">📍 Mismas mascotas que ves en la baraja, en el mapa.</p>
+      <div id="petsMap" class="pets-map"></div>
+    </div>
+  </div>
+
+  <!-- Patitas Plus upsell modal -->
+  <div id="upsellModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="closeUpsellModal" aria-label="Cerrar">✕</button>
+      <h2>🐾 Patitas Plus</h2>
+      <p id="upsellMessage" class="form-hint upsell-message"></p>
+      <a href="/patitas-plus/" class="restart-btn upsell-cta">Conocer Patitas Plus</a>
     </div>
   </div>
 

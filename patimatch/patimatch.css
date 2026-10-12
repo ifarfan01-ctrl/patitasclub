@@ -66,7 +66,9 @@ body {
 
 .my-pet-actions {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 10px;
   align-items: center;
 }
 

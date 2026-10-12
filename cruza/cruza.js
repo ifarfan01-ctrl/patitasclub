@@ -30,7 +30,7 @@ import {
   deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
-import { attachAddressAutocomplete } from "../address-autocomplete.js";
+import { attachAddressAutocomplete, loadGoogleMapsBootstrap } from "../address-autocomplete.js";
 import { watchUserPlan } from "../plans.js";
 
 const app = initializeApp(firebaseConfig);
@@ -75,6 +75,11 @@ const petPhoneInput = document.getElementById("petPhone");
 const listingsEl = document.getElementById("listings");
 const listingsEmpty = document.getElementById("listingsEmpty");
 
+const mapBtn = document.getElementById("mapBtn");
+const mapModal = document.getElementById("mapModal");
+const closeMapModal = document.getElementById("closeMapModal");
+const petsMapEl = document.getElementById("petsMap");
+
 const upsellModal = document.getElementById("upsellModal");
 const upsellMessage = document.getElementById("upsellMessage");
 const closeUpsellModal = document.getElementById("closeUpsellModal");
@@ -94,6 +99,141 @@ let editingPetFoto = "";
 let editingHasAddress = false;
 let selectedAddress = null;
 let latestDocs = [];
+
+let mapInstance = null;
+let mapInfoWindow = null;
+let mapMarkers = [];
+let userLocationMarker = null;
+
+function pawMarkerIcon() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="52" viewBox="0 0 40 52">
+<path d="M20 1C10 1 2 9 2 19c0 13 18 31 18 31s18-18 18-31C38 9 30 1 20 1z" fill="#ff8a5b" stroke="#ffffff" stroke-width="2"/>
+<g transform="translate(6,5) scale(0.42)">
+<circle cx="14" cy="24" r="7" fill="#ffffff"/>
+<circle cx="27" cy="13" r="7.5" fill="#ffffff"/>
+<circle cx="41" cy="13" r="7.5" fill="#ffffff"/>
+<circle cx="54" cy="24" r="7" fill="#ffffff"/>
+<ellipse cx="34" cy="43" rx="18" ry="15" fill="#ffffff"/>
+</g>
+</svg>`;
+  return {
+    url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
+    scaledSize: new google.maps.Size(40, 52),
+    anchor: new google.maps.Point(20, 50),
+  };
+}
+
+function buildPetInfoContent(data) {
+  const wrap = document.createElement("div");
+  wrap.style.textAlign = "center";
+  wrap.style.maxWidth = "160px";
+  if (data.foto) {
+    const img = document.createElement("img");
+    img.src = data.foto;
+    img.alt = "";
+    img.style.width = "100%";
+    img.style.height = "90px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "8px";
+    img.style.marginBottom = "6px";
+    wrap.appendChild(img);
+  }
+  const strong = document.createElement("strong");
+  strong.textContent = data.nombre || "Sin nombre";
+  wrap.appendChild(strong);
+  wrap.appendChild(document.createElement("br"));
+  const span = document.createElement("span");
+  span.style.color = "#777";
+  span.style.fontSize = "0.85rem";
+  span.textContent = [data.especie, data.raza].filter(Boolean).join(" · ");
+  wrap.appendChild(span);
+  return wrap;
+}
+
+async function initMap() {
+  if (mapInstance) return;
+  await loadGoogleMapsBootstrap();
+  const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+  await google.maps.importLibrary("marker");
+  mapInstance = new Map(petsMapEl, {
+    center: { lat: -33.4489, lng: -70.6693 },
+    zoom: 11,
+  });
+  mapInfoWindow = new InfoWindow();
+}
+
+function clearMapMarkers() {
+  mapMarkers.forEach((m) => m.setMap(null));
+  mapMarkers = [];
+}
+
+function renderMapMarkers() {
+  if (!mapInstance) return;
+  clearMapMarkers();
+  const bounds = new google.maps.LatLngBounds();
+  let any = false;
+  latestDocs.forEach(({ data }) => {
+    if (typeof data.mapLat !== "number" || typeof data.mapLng !== "number") return;
+    const position = { lat: data.mapLat, lng: data.mapLng };
+    const marker = new google.maps.Marker({
+      position,
+      map: mapInstance,
+      icon: pawMarkerIcon(),
+      title: data.nombre || "Mascota para cruza",
+    });
+    marker.addListener("click", () => {
+      mapInfoWindow.setContent(buildPetInfoContent(data));
+      mapInfoWindow.open(mapInstance, marker);
+    });
+    mapMarkers.push(marker);
+    bounds.extend(position);
+    any = true;
+  });
+  if (any) mapInstance.fitBounds(bounds, 60);
+}
+
+function recenterOnUser() {
+  if (!navigator.geolocation || !mapInstance) return;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const here = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      mapInstance.setCenter(here);
+      mapInstance.setZoom(12);
+      if (userLocationMarker) userLocationMarker.setMap(null);
+      userLocationMarker = new google.maps.Marker({
+        position: here,
+        map: mapInstance,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: "#4285F4",
+          fillOpacity: 1,
+          strokeColor: "#fff",
+          strokeWeight: 2,
+        },
+        title: "Tu ubicación",
+      });
+    },
+    () => { /* ubicación denegada o no disponible: se mantiene la vista por defecto */ },
+    { timeout: 8000 }
+  );
+}
+
+async function openMapModal() {
+  mapModal.hidden = false;
+  await initMap();
+  renderMapMarkers();
+  recenterOnUser();
+}
+
+mapBtn.addEventListener("click", () => {
+  if (currentPlan !== "plus") {
+    openUpsellModal("Buscar mascotas en el mapa es una función de Patitas Plus.");
+    return;
+  }
+  openMapModal();
+});
+closeMapModal.addEventListener("click", () => { mapModal.hidden = true; });
 
 function resetAddressField() {
   selectedAddress = null;
@@ -314,6 +454,10 @@ publishForm.addEventListener("submit", async (e) => {
       foto: fotoUrl,
       descripcion: document.getElementById("petDescription").value.trim(),
     };
+    if (selectedAddress) {
+      data.mapLat = selectedAddress.lat;
+      data.mapLng = selectedAddress.lng;
+    }
     let petId = editingPetId;
     if (editingPetId) {
       await updateDoc(doc(db, "cruzas", editingPetId), data);
@@ -508,7 +652,34 @@ function renderListings() {
   latestDocs.forEach(({ id, data }) => {
     listingsEl.appendChild(petCard(id, data));
   });
+  if (mapInstance && !mapModal.hidden) renderMapMarkers();
+  syncOwnedMapCoords();
   updatePublishButtonState();
+}
+
+// Las publicaciones creadas antes del mapa no tienen mapLat/mapLng. Solo el
+// dueño puede leer su dirección privada, así que esto corrige sus propias
+// mascotas la próxima vez que entra a esta página con sesión iniciada.
+const syncedIds = new Set();
+
+async function syncOwnedMapCoords() {
+  if (!currentUser) return;
+  const targets = latestDocs.filter(({ id, data }) =>
+    data.ownerUid === currentUser.uid && !syncedIds.has(id)
+  );
+  for (const { id, data } of targets) {
+    syncedIds.add(id);
+    try {
+      const privateSnap = await getDoc(doc(db, "cruzas", id, "private", "info"));
+      if (!privateSnap.exists()) continue;
+      const { lat, lng } = privateSnap.data();
+      if (typeof lat !== "number" || typeof lng !== "number") continue;
+      if (data.mapLat === lat && data.mapLng === lng) continue;
+      await updateDoc(doc(db, "cruzas", id), { mapLat: lat, mapLng: lng });
+    } catch (err) {
+      // Si falla, se reintenta en una próxima carga porque no se guardó.
+    }
+  }
 }
 
 const q = query(collection(db, "cruzas"), orderBy("createdAt", "desc"));
