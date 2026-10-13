@@ -1,5 +1,11 @@
 {
   "appId": "cl.untalivan.patitasclub",
   "appName": "Patitas Club",
-  "webDir": "www"
+  "webDir": "www",
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": ["google.com"]
+    }
+  }
 }

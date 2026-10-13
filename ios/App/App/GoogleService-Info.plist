@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>128385776727-jvhfla9msrjhrj55a7jaasa6ed4pj5rd.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.128385776727-jvhfla9msrjhrj55a7jaasa6ed4pj5rd</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>128385776727-f7p7kqfdc9k9je5d4o204potsgvd4se7.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCjSaB-raIqGH8wmgJoSuZgZVua1VS-U2U</string>
+	<key>GCM_SENDER_ID</key>
+	<string>128385776727</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>cl.untalivan.patitasclub</string>
+	<key>PROJECT_ID</key>
+	<string>patitasclub</string>
+	<key>STORAGE_BUCKET</key>
+	<string>patitasclub.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:128385776727:ios:7b1b53b44c83b7f8823712</string>
+</dict>
+</plist>

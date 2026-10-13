@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "128385776727",
+    "project_id": "patitasclub",
+    "storage_bucket": "patitasclub.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128385776727:android:b4c67de425aa1944823712",
+        "android_client_info": {
+          "package_name": "cl.untalivan.patitasclub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "128385776727-f7p7kqfdc9k9je5d4o204potsgvd4se7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cl.untalivan.patitasclub",
+            "certificate_hash": "d8e95df3ecc0540faa616b9dd65eb77ae6808c4e"
+          }
+        },
+        {
+          "client_id": "128385776727-aqjb32md6qb6vte8k31h784s1lgrn5n4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGha6jlqpH_EktbBIS07hE2hOlKDxah2M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "128385776727-aqjb32md6qb6vte8k31h784s1lgrn5n4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "128385776727-jvhfla9msrjhrj55a7jaasa6ed4pj5rd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "cl.untalivan.patitasclub"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

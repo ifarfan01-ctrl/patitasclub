@@ -1,9 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
   GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
@@ -32,9 +30,10 @@ import {
 import { firebaseConfig } from "../firebase-config.js";
 import { attachAddressAutocomplete, loadGoogleMapsBootstrap } from "../address-autocomplete.js";
 import { watchUserPlan } from "../plans.js";
+import { getAuthCompat, signInWithGoogleCompat } from "../native-auth.js";
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const auth = getAuthCompat(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
@@ -316,7 +315,7 @@ googleBtn.addEventListener("click", async () => {
   }
   googleBtn.disabled = true;
   try {
-    await signInWithPopup(auth, googleProvider);
+    await signInWithGoogleCompat(auth, googleProvider);
     authModal.hidden = true;
   } catch (err) {
     if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") {
