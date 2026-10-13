@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2732" height="2732" viewBox="0 0 2732 2732">
+  <rect width="2732" height="2732" fill="#fffaf5"/>
+  <g transform="translate(916,816) scale(14.0625)" fill="#ff8a5b">
+    <circle cx="14" cy="24" r="7"/>
+    <circle cx="27" cy="13" r="7.5"/>
+    <circle cx="41" cy="13" r="7.5"/>
+    <circle cx="54" cy="24" r="7"/>
+    <ellipse cx="34" cy="43" rx="18" ry="15"/>
+  </g>
+  <text x="1366" y="1830" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="110" font-weight="800" fill="#e8663a" text-anchor="middle">Patitas Club</text>
+</svg>
