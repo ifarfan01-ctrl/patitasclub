@@ -8,7 +8,9 @@
 
 .auth-box {
   display: flex;
-  gap: 8px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  gap: 2px;
   align-items: center;
   font-size: 0.9rem;
 }
@@ -19,8 +21,9 @@
   color: var(--brand-dark);
   font-weight: 600;
   cursor: pointer;
-  padding: 6px 10px;
-  font-size: 0.95rem;
+  padding: 10px 8px;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .link-btn:hover {
@@ -29,8 +32,16 @@
 
 .user-email {
   color: var(--muted);
-  font-size: 0.9rem;
-  margin-right: 4px;
+  font-size: 0.85rem;
+  margin-right: 2px;
+  max-width: 34vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  .link-btn { padding: 10px 6px; font-size: 0.82rem; }
 }
 
 .page-head {
@@ -52,7 +63,7 @@
 
 .restart-btn {
   border: none;
-  padding: 10px 22px;
+  padding: 13px 22px;
   border-radius: 24px;
   background: linear-gradient(90deg, var(--brand), var(--brand-dark));
   color: #fff;
@@ -199,11 +210,16 @@
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 14px;
+  top: 6px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
   background: none;
   border: none;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   cursor: pointer;
   color: var(--muted);
 }
